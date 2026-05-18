@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密码生成器 - 生活效率工具箱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1D2129;
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .result-section {
+            background: #F2F3F5;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .password-display {
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            color: #165DFF;
+            word-break: break-all;
+            min-height: 36px;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: #165DFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #0e42d2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 93, 255, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: #00b42a;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .setting-item {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #4E5969;
+            font-size: 15px;
+        }
+
+        .length-value {
+            font-weight: 600;
+            color: #165DFF;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #E5E6EB;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #165DFF;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(22, 93, 255, 0.1);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #165DFF;
+        }
+
+        .checkbox-item label {
+            color: #1D2129;
+            font-size: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .password-display {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 密码生成器</h1>
+        
+        <div class="result-section">
+            <div class="password-display" id="passwordDisplay">点击生成密码</div>
+            <button class="copy-btn" id="copyBtn">📋 复制密码</button>
+        </div>
+
+        <div class="settings-section">
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span>密码长度</span>
+                    <span class="length-value" id="lengthValue">16</span>
+                </div>
+                <input type="range" id="lengthSlider" min="8" max="32" value="16">
+            </div>
+
+            <div class="setting-item">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="uppercase" checked>
+                    <label for="uppercase">大写字母 (A-Z)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="lowercase" checked>
+                    <label for="lowercase">小写字母 (a-z)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="numbers" checked>
+                    <label for="numbers">数字 (0-9)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="symbols" checked>
+                    <label for="symbols">特殊符号 (!@#$%^&*)</label>
+                </div>
+            </div>
+        </div>
+
+        <button class="generate-btn" id="generateBtn">✨ 生成密码</button>
+    </div>
+
+    <script>
+        const charset = {
+            uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            lowercase: 'abcdefghijklmnopqrstuvwxyz',
+            numbers: '0123456789',
+            symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+        };
+
+        const passwordDisplay = document.getElementById('passwordDisplay');
+        const copyBtn = document.getElementById('copyBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const lengthSlider = document.getElementById('lengthSlider');
+        const lengthValue = document.getElementById('lengthValue');
+        const uppercase = document.getElementById('uppercase');
+        const lowercase = document.getElementById('lowercase');
+        const numbers = document.getElementById('numbers');
+        const symbols = document.getElementById('symbols');
+
+        lengthSlider.addEventListener('input', () => {
+            lengthValue.textContent = lengthSlider.value;
+        });
+
+        function generatePassword() {
+            let validChars = '';
+            let password = '';
+
+            if (uppercase.checked) validChars += charset.uppercase;
+            if (lowercase.checked) validChars += charset.lowercase;
+            if (numbers.checked) validChars += charset.numbers;
+            if (symbols.checked) validChars += charset.symbols;
+
+            if (validChars === '') {
+                passwordDisplay.textContent = '请至少选择一种字符类型';
+                return;
+            }
+
+            for (let i = 0; i < lengthSlider.value; i++) {
+                const randomIndex = Math.floor(Math.random() * validChars.length);
+                password += validChars[randomIndex];
+            }
+
+            passwordDisplay.textContent = password;
+            copyBtn.textContent = '📋 复制密码';
+            copyBtn.classList.remove('copied');
+        }
+
+        async function copyPassword() {
+            const password = passwordDisplay.textContent;
+            if (password && password !== '点击生成密码' && password !== '请至少选择一种字符类型') {
+                try {
+                    await navigator.clipboard.writeText(password);
+                    copyBtn.textContent = '✅ 已复制';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 复制密码';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    alert('复制失败，请手动复制');
+                }
+            }
+        }
+
+        generateBtn.addEventListener('click', generatePassword);
+        copyBtn.addEventListener('click', copyPassword);
+
+        generatePassword();
+    </script>
+</body>
+</html>
