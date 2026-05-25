@@ -727,11 +727,13 @@ const VideoDownloader = {
         this.elements.progressFill.style.width = percent + '%';
         this.elements.progressText.textContent = text;
         this.elements.downloadBtn.disabled = true;
+        this.elements.quickDownloadBtn.disabled = true;
     },
     
     hideProgress() {
         this.elements.progressContainer.style.display = 'none';
         this.elements.downloadBtn.disabled = false;
+        this.elements.quickDownloadBtn.disabled = false;
     }
 };
 
