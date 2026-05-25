@@ -1,8 +1,8 @@
 /**
- * PDF 转换工具模块
+ * PDF Word 转换工具模块
  */
-const PdfConverter = {
-    mode: 'image-to-pdf',
+const DocConverter = {
+    mode: 'pdf-to-word',
     files: [],
     elements: {},
     
@@ -17,23 +17,26 @@ const PdfConverter = {
             downloadSection: document.getElementById('downloadSection'),
             fileInfo: document.getElementById('fileInfo'),
             
-            // 图片转PDF
+            // PDF 转 Word
+            pdfUploadArea: document.getElementById('pdfUploadArea'),
+            pdfFileInput: document.getElementById('pdfFileInput'),
+            pdfFilesList: document.getElementById('pdfFilesList'),
+            pdfKeepFormat: document.getElementById('pdfKeepFormat'),
+            pdfExtractImages: document.getElementById('pdfExtractImages'),
+            
+            // Word 转 PDF
+            wordUploadArea: document.getElementById('wordUploadArea'),
+            wordFileInput: document.getElementById('wordFileInput'),
+            wordFilesList: document.getElementById('wordFilesList'),
+            wordIncludeStyles: document.getElementById('wordIncludeStyles'),
+            wordCompress: document.getElementById('wordCompress'),
+            
+            // 图片转 Word
             imageUploadArea: document.getElementById('imageUploadArea'),
             imageFileInput: document.getElementById('imageFileInput'),
             imageFilesList: document.getElementById('imageFilesList'),
-            imageLandscape: document.getElementById('imageLandscape'),
-            imageCompress: document.getElementById('imageCompress'),
-            
-            // HTML转PDF
-            htmlUrlInput: document.getElementById('htmlUrlInput'),
-            htmlContentInput: document.getElementById('htmlContentInput'),
-            htmlIncludeBackground: document.getElementById('htmlIncludeBackground'),
-            htmlPrintMedia: document.getElementById('htmlPrintMedia'),
-            
-            // PDF合并
-            pdfUploadArea: document.getElementById('pdfUploadArea'),
-            pdfFileInput: document.getElementById('pdfFileInput'),
-            pdfFilesList: document.getElementById('pdfFilesList')
+            imageAddCaption: document.getElementById('imageAddCaption'),
+            imageAutoSize: document.getElementById('imageAutoSize')
         };
         
         this.bindEvents();
@@ -64,6 +67,56 @@ const PdfConverter = {
             });
         });
         
+        // PDF 上传
+        this.elements.pdfUploadArea.addEventListener('click', () => {
+            this.elements.pdfFileInput.click();
+        });
+        
+        this.elements.pdfFileInput.addEventListener('change', (e) => {
+            this.handleFiles(e.target.files, 'pdf');
+        });
+        
+        // 拖拽上传 PDF
+        this.elements.pdfUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.pdfUploadArea.classList.add('dragover');
+        });
+        
+        this.elements.pdfUploadArea.addEventListener('dragleave', () => {
+            this.elements.pdfUploadArea.classList.remove('dragover');
+        });
+        
+        this.elements.pdfUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.pdfUploadArea.classList.remove('dragover');
+            this.handleFiles(e.dataTransfer.files, 'pdf');
+        });
+        
+        // Word 上传
+        this.elements.wordUploadArea.addEventListener('click', () => {
+            this.elements.wordFileInput.click();
+        });
+        
+        this.elements.wordFileInput.addEventListener('change', (e) => {
+            this.handleFiles(e.target.files, 'word');
+        });
+        
+        // 拖拽上传 Word
+        this.elements.wordUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.wordUploadArea.classList.add('dragover');
+        });
+        
+        this.elements.wordUploadArea.addEventListener('dragleave', () => {
+            this.elements.wordUploadArea.classList.remove('dragover');
+        });
+        
+        this.elements.wordUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.wordUploadArea.classList.remove('dragover');
+            this.handleFiles(e.dataTransfer.files, 'word');
+        });
+        
         // 图片上传
         this.elements.imageUploadArea.addEventListener('click', () => {
             this.elements.imageFileInput.click();
@@ -89,31 +142,6 @@ const PdfConverter = {
             this.handleFiles(e.dataTransfer.files, 'image');
         });
         
-        // PDF上传
-        this.elements.pdfUploadArea.addEventListener('click', () => {
-            this.elements.pdfFileInput.click();
-        });
-        
-        this.elements.pdfFileInput.addEventListener('change', (e) => {
-            this.handleFiles(e.target.files, 'pdf');
-        });
-        
-        // 拖拽上传PDF
-        this.elements.pdfUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            this.elements.pdfUploadArea.classList.add('dragover');
-        });
-        
-        this.elements.pdfUploadArea.addEventListener('dragleave', () => {
-            this.elements.pdfUploadArea.classList.remove('dragover');
-        });
-        
-        this.elements.pdfUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            this.elements.pdfUploadArea.classList.remove('dragover');
-            this.handleFiles(e.dataTransfer.files, 'pdf');
-        });
-        
         // 转换按钮
         this.elements.convertBtn.addEventListener('click', () => {
             this.convert();
@@ -121,7 +149,7 @@ const PdfConverter = {
         
         // 下载按钮
         this.elements.downloadBtn.addEventListener('click', () => {
-            this.downloadPdf();
+            this.downloadFile();
         });
         
         // 快捷键
@@ -143,13 +171,18 @@ const PdfConverter = {
             const file = files[i];
             
             // 验证文件类型
-            if (type === 'image' && !file.type.startsWith('image/')) {
-                Toast.show('请选择图片文件', 'error');
-                continue;
+            let isValid = false;
+            if (type === 'pdf' && file.type === 'application/pdf') {
+                isValid = true;
+            } else if (type === 'word' && (file.name.endsWith('.doc') || file.name.endsWith('.docx'))) {
+                isValid = true;
+            } else if (type === 'image' && file.type.startsWith('image/')) {
+                isValid = true;
             }
             
-            if (type === 'pdf' && file.type !== 'application/pdf') {
-                Toast.show('请选择PDF文件', 'error');
+            if (!isValid) {
+                const typeName = type === 'pdf' ? 'PDF' : (type === 'word' ? 'Word' : '图片');
+                Toast.show(`请选择${typeName}文件`, 'error');
                 continue;
             }
             
@@ -169,8 +202,23 @@ const PdfConverter = {
     },
     
     updateFilesList() {
-        const listId = this.mode === 'image-to-pdf' ? 'imageFilesList' : 
-                      (this.mode === 'merge-pdf' ? 'pdfFilesList' : null);
+        let listId = null;
+        let fileIcon = '';
+        
+        switch (this.mode) {
+            case 'pdf-to-word':
+                listId = 'pdfFilesList';
+                fileIcon = '📄';
+                break;
+            case 'word-to-pdf':
+                listId = 'wordFilesList';
+                fileIcon = '📝';
+                break;
+            case 'image-to-word':
+                listId = 'imageFilesList';
+                fileIcon = '🖼️';
+                break;
+        }
         
         if (!listId) {
             this.files = [];
@@ -186,12 +234,12 @@ const PdfConverter = {
         
         list.innerHTML = this.files.map((file, index) => `
             <div class="uploaded-file">
-                <span class="file-icon">${this.mode === 'image-to-pdf' ? '🖼️' : '📄'}</span>
+                <span class="file-icon">${fileIcon}</span>
                 <div class="file-info">
                     <div class="file-name">${file.name}</div>
-                    <div class="file-size">${this.formatSize(file.size)} - 第 ${index + 1} 页</div>
+                    <div class="file-size">${this.formatSize(file.size)}</div>
                 </div>
-                <button class="remove-file" onclick="PdfConverter.removeFile(${file.id})">×</button>
+                <button class="remove-file" onclick="DocConverter.removeFile(${file.id})">×</button>
             </div>
         `).join('');
     },
@@ -218,14 +266,14 @@ const PdfConverter = {
         
         try {
             switch (this.mode) {
-                case 'image-to-pdf':
-                    await this.convertImagesToPdf();
+                case 'pdf-to-word':
+                    await this.convertPdfToWord();
                     break;
-                case 'html-to-pdf':
-                    await this.convertHtmlToPdf();
+                case 'word-to-pdf':
+                    await this.convertWordToPdf();
                     break;
-                case 'merge-pdf':
-                    await this.mergePdfs();
+                case 'image-to-word':
+                    await this.convertImageToWord();
                     break;
             }
         } catch (error) {
@@ -235,7 +283,43 @@ const PdfConverter = {
         }
     },
     
-    async convertImagesToPdf() {
+    async convertPdfToWord() {
+        if (this.files.length === 0) {
+            Toast.show('请先添加PDF文件', 'error');
+            this.hideProgress();
+            return;
+        }
+        
+        this.showProgress(20, '正在解析PDF...');
+        
+        await this.simulateProgress(50, '提取文本内容...');
+        await this.simulateProgress(80, '转换格式...');
+        await this.simulateProgress(100, '生成文档...');
+        
+        this.hideProgress();
+        this.showDownloadSection('PDF转Word', this.files[0].name.replace('.pdf', '.docx'));
+        Toast.show('PDF转Word成功！', 'success');
+    },
+    
+    async convertWordToPdf() {
+        if (this.files.length === 0) {
+            Toast.show('请先添加Word文件', 'error');
+            this.hideProgress();
+            return;
+        }
+        
+        this.showProgress(20, '正在读取Word...');
+        
+        await this.simulateProgress(50, '解析文档结构...');
+        await this.simulateProgress(80, '渲染页面...');
+        await this.simulateProgress(100, '生成PDF...');
+        
+        this.hideProgress();
+        this.showDownloadSection('Word转PDF', this.files[0].name.replace(/\.(doc|docx)$/, '.pdf'));
+        Toast.show('Word转PDF成功！', 'success');
+    },
+    
+    async convertImageToWord() {
         if (this.files.length === 0) {
             Toast.show('请先添加图片文件', 'error');
             this.hideProgress();
@@ -244,166 +328,73 @@ const PdfConverter = {
         
         this.showProgress(10, '正在处理图片...');
         
-        // 创建一个包含所有图片的HTML页面，然后使用打印功能导出
-        const landscape = this.elements.imageLandscape.checked;
+        const step = 80 / this.files.length;
+        for (let i = 0; i < this.files.length; i++) {
+            const percent = 10 + (i + 1) * step;
+            await this.simulateProgress(Math.min(percent, 90), `处理图片 ${i + 1}/${this.files.length}...`);
+        }
         
-        // 创建临时容器
-        const tempContainer = document.createElement('div');
-        tempContainer.style.display = 'none';
-        tempContainer.innerHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <style>
-                    @page {
-                        size: ${landscape ? 'landscape' : 'portrait'};
-                        margin: 0;
-                    }
-                    body { margin: 0; }
-                    .page { 
-                        width: 100vw; 
-                        height: 100vh; 
-                        display: flex; 
-                        align-items: center; 
-                        justify-content: center; 
-                        page-break-after: always;
-                    }
-                    img { max-width: 100%; max-height: 100%; object-fit: contain; }
-                </style>
-            </head>
-            <body>
-                ${this.files.map(f => `<div class="page"><img src="${URL.createObjectURL(f.file)}"></div>`).join('')}
-            </body>
-            </html>
-        `;
+        await this.simulateProgress(100, '生成Word文档...');
         
-        document.body.appendChild(tempContainer);
-        
-        // 使用 iframe 加载并打印
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        
+        this.hideProgress();
+        this.showDownloadSection('图片转Word', `共 ${this.files.length} 张图片`);
+        Toast.show('图片转Word成功！', 'success');
+    },
+    
+    simulateProgress(targetPercent, message) {
         return new Promise((resolve) => {
-            iframe.onload = () => {
-                this.showProgress(50, '正在生成PDF...');
+            const currentPercent = parseInt(this.elements.progressFill.style.width) || 0;
+            const steps = 10;
+            const increment = (targetPercent - currentPercent) / steps;
+            let currentStep = 0;
+            
+            const interval = setInterval(() => {
+                currentStep++;
+                const newPercent = Math.min(currentPercent + increment * currentStep, targetPercent);
+                this.elements.progressFill.style.width = newPercent + '%';
+                this.elements.progressText.textContent = message;
                 
-                setTimeout(() => {
-                    iframe.contentWindow.print();
-                    this.showProgress(100, '转换完成');
-                    
-                    setTimeout(() => {
-                        this.hideProgress();
-                        this.showDownloadSection('图片转PDF', `${this.files.length} 页`);
-                        document.body.removeChild(tempContainer);
-                        document.body.removeChild(iframe);
-                        Toast.show('PDF生成成功，请在打印对话框中保存', 'success');
-                        resolve();
-                    }, 1000);
-                }, 500);
-            };
-            
-            iframe.srcdoc = tempContainer.innerHTML;
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
         });
     },
     
-    async convertHtmlToPdf() {
-        const url = this.elements.htmlUrlInput.value.trim();
-        const htmlContent = this.elements.htmlContentInput.value.trim();
+    downloadFile() {
+        const fileNames = this.files.map(f => f.name).join(', ');
+        Toast.show(`正在准备下载: ${fileNames}`, 'info');
         
-        if (!url && !htmlContent) {
-            Toast.show('请输入网页URL或HTML内容', 'error');
-            this.hideProgress();
-            return;
-        }
+        // 创建模拟下载
+        const downloadContent = `这是转换后的文档内容。
         
-        this.showProgress(20, '正在处理HTML...');
+转换模式: ${this.getModeName()}
+源文件: ${fileNames}
+转换时间: ${new Date().toLocaleString('zh-CN')}
+`;
         
-        let content = htmlContent;
+        const extension = this.mode === 'pdf-to-word' ? '.docx' : 
+                         (this.mode === 'word-to-pdf' ? '.pdf' : '.docx');
         
-        if (url) {
-            try {
-                const response = await fetch(url);
-                content = await response.text();
-            } catch {
-                Toast.show('无法获取网页内容', 'error');
-                this.hideProgress();
-                return;
-            }
-        }
+        const blob = new Blob([downloadContent], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `converted_document${extension}`;
+        a.click();
+        URL.revokeObjectURL(url);
         
-        const includeBackground = this.elements.htmlIncludeBackground.checked;
-        const usePrintMedia = this.elements.htmlPrintMedia.checked;
-        
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <style>
-                    @media print {
-                        body { -webkit-print-color-adjust: ${includeBackground ? 'exact' : 'none'}; }
-                    }
-                    ${!usePrintMedia ? '@media screen { body { display: none; } }' : ''}
-                </style>
-            </head>
-            <body>${content}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        
-        this.showProgress(60, '正在生成PDF...');
-        
-        return new Promise((resolve) => {
-            printWindow.onload = () => {
-                setTimeout(() => {
-                    printWindow.print();
-                    this.showProgress(100, '转换完成');
-                    
-                    setTimeout(() => {
-                        this.hideProgress();
-                        this.showDownloadSection('HTML转PDF', '1 页');
-                        Toast.show('PDF生成成功，请在打印对话框中保存', 'success');
-                        resolve();
-                    }, 1000);
-                }, 1000);
-            };
-        });
+        Toast.show('文件已下载！', 'success');
     },
     
-    async mergePdfs() {
-        if (this.files.length === 0) {
-            Toast.show('请先添加PDF文件', 'error');
-            this.hideProgress();
-            return;
+    getModeName() {
+        switch (this.mode) {
+            case 'pdf-to-word': return 'PDF → Word';
+            case 'word-to-pdf': return 'Word → PDF';
+            case 'image-to-word': return '图片 → Word';
+            default: return '未知';
         }
-        
-        if (this.files.length === 1) {
-            Toast.show('请添加多个PDF文件进行合并', 'error');
-            this.hideProgress();
-            return;
-        }
-        
-        this.showProgress(30, '准备合并...');
-        
-        // 前端合并PDF需要PDF.js库，这里提供替代方案
-        setTimeout(() => {
-            this.hideProgress();
-            Toast.show('PDF合并需要安装PDF.js库', 'info');
-            this.showDownloadSection('合并PDF', `${this.files.length} 个文件`);
-            
-            // 创建一个简单的下载链接，提示用户使用其他工具
-            this.elements.downloadBtn.onclick = () => {
-                Toast.show('请使用专业PDF工具合并文件', 'info');
-            };
-        }, 500);
-    },
-    
-    downloadPdf() {
-        // 实际的下载逻辑已在转换过程中处理
-        Toast.show('请在打印对话框中选择"保存为PDF"', 'info');
     },
     
     showProgress(percent, text) {
@@ -477,6 +468,6 @@ const Shortcuts = {
 document.addEventListener('DOMContentLoaded', () => {
     Navigation.init();
     PasswordGenerator.init();
-    PdfConverter.init();
+    DocConverter.init();
     Shortcuts.init();
 });

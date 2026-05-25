@@ -27,8 +27,8 @@
                     <span>密码生成</span>
                 </button>
                 <button class="nav-tab" data-tool="todo">
-                    <span class="tab-icon">📄</span>
-                    <span>PDF转换</span>
+                    <span class="tab-icon">�</span>
+                    <span>文档转换</span>
                 </button>
             </nav>
         </div>
@@ -98,31 +98,77 @@
             </div>
         </section>
 
-        <!-- PDF 转换工具面板 -->
+        <!-- PDF Word 转换工具面板 -->
         <section class="tool-panel" id="todoPanel">
             <div class="card">
-                <div class="card-title">📄 PDF 转换工具</div>
+                <div class="card-title">� PDF Word 转换工具</div>
                 
                 <!-- 转换模式选择 -->
                 <div class="conversion-modes">
-                    <button class="mode-btn active" data-mode="image-to-pdf">
-                        <span class="mode-icon">🖼️</span>
-                        <span>图片转 PDF</span>
+                    <button class="mode-btn active" data-mode="pdf-to-word">
+                        <span class="mode-icon">�</span>
+                        <span>PDF 转 Word</span>
                     </button>
-                    <button class="mode-btn" data-mode="html-to-pdf">
-                        <span class="mode-icon">🌐</span>
-                        <span>HTML 转 PDF</span>
+                    <button class="mode-btn" data-mode="word-to-pdf">
+                        <span class="mode-icon">📝</span>
+                        <span>Word 转 PDF</span>
                     </button>
-                    <button class="mode-btn" data-mode="merge-pdf">
-                        <span class="mode-icon">📑</span>
-                        <span>合并 PDF</span>
+                    <button class="mode-btn" data-mode="image-to-word">
+                        <span class="mode-icon">�️</span>
+                        <span>图片转 Word</span>
                     </button>
                 </div>
 
-                <!-- 图片转 PDF 模式 -->
-                <div class="mode-panel active" id="imageToPdfPanel">
+                <!-- PDF 转 Word 模式 -->
+                <div class="mode-panel active" id="pdfToWordPanel">
+                    <div class="upload-area" id="pdfUploadArea">
+                        <div class="upload-icon">�</div>
+                        <div class="upload-text">点击或拖拽 PDF 文件到此处</div>
+                        <div class="upload-hint">支持 PDF 格式文件</div>
+                        <input type="file" id="pdfFileInput" accept=".pdf" hidden>
+                    </div>
+                    
+                    <div class="uploaded-files" id="pdfFilesList"></div>
+
+                    <div class="options-section">
+                        <label class="option-item">
+                            <input type="checkbox" id="pdfKeepFormat" checked>
+                            <span>保留格式</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="pdfExtractImages">
+                            <span>提取图片</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Word 转 PDF 模式 -->
+                <div class="mode-panel" id="wordToPdfPanel">
+                    <div class="upload-area" id="wordUploadArea">
+                        <div class="upload-icon">📝</div>
+                        <div class="upload-text">点击或拖拽 Word 文件到此处</div>
+                        <div class="upload-hint">支持 DOC、DOCX 格式</div>
+                        <input type="file" id="wordFileInput" accept=".doc,.docx" hidden>
+                    </div>
+                    
+                    <div class="uploaded-files" id="wordFilesList"></div>
+
+                    <div class="options-section">
+                        <label class="option-item">
+                            <input type="checkbox" id="wordIncludeStyles" checked>
+                            <span>包含样式</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="wordCompress">
+                            <span>压缩输出</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 图片转 Word 模式 -->
+                <div class="mode-panel" id="imageToWordPanel">
                     <div class="upload-area" id="imageUploadArea">
-                        <div class="upload-icon">📷</div>
+                        <div class="upload-icon">�️</div>
                         <div class="upload-text">点击或拖拽图片到此处</div>
                         <div class="upload-hint">支持 JPG、PNG、GIF 格式</div>
                         <input type="file" id="imageFileInput" accept="image/*" multiple hidden>
@@ -132,46 +178,14 @@
 
                     <div class="options-section">
                         <label class="option-item">
-                            <input type="checkbox" id="imageLandscape" checked>
-                            <span>横向布局</span>
+                            <input type="checkbox" id="imageAddCaption" checked>
+                            <span>添加图片说明</span>
                         </label>
                         <label class="option-item">
-                            <input type="checkbox" id="imageCompress">
-                            <span>压缩图片</span>
+                            <input type="checkbox" id="imageAutoSize">
+                            <span>自动调整大小</span>
                         </label>
                     </div>
-                </div>
-
-                <!-- HTML 转 PDF 模式 -->
-                <div class="mode-panel" id="htmlToPdfPanel">
-                    <div class="url-input-section">
-                        <input type="url" class="url-input" id="htmlUrlInput" placeholder="输入网页 URL...">
-                    </div>
-                    
-                    <textarea class="html-textarea" id="htmlContentInput" placeholder="或直接输入 HTML 内容..."></textarea>
-
-                    <div class="options-section">
-                        <label class="option-item">
-                            <input type="checkbox" id="htmlIncludeBackground" checked>
-                            <span>包含背景</span>
-                        </label>
-                        <label class="option-item">
-                            <input type="checkbox" id="htmlPrintMedia">
-                            <span>使用打印样式</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 合并 PDF 模式 -->
-                <div class="mode-panel" id="mergePdfPanel">
-                    <div class="upload-area" id="pdfUploadArea">
-                        <div class="upload-icon">📄</div>
-                        <div class="upload-text">点击或拖拽 PDF 文件到此处</div>
-                        <div class="upload-hint">支持多个 PDF 文件</div>
-                        <input type="file" id="pdfFileInput" accept=".pdf" multiple hidden>
-                    </div>
-                    
-                    <div class="uploaded-files" id="pdfFilesList"></div>
                 </div>
 
                 <!-- 转换按钮 -->
@@ -190,7 +204,7 @@
                 <!-- 下载区域 -->
                 <div class="download-section" id="downloadSection" style="display: none;">
                     <button class="download-btn" id="downloadBtn">
-                        📥 下载 PDF
+                        📥 下载文件
                     </button>
                     <div class="file-info" id="fileInfo"></div>
                 </div>
