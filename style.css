@@ -5,20 +5,23 @@
 }
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --primary-color: #165DFF;
-    --success-color: #00b42a;
-    --warning-color: #ff7d00;
-    --danger-color: #f53f3f;
-    --bg-light: #F2F3F5;
-    --text-primary: #1D2129;
-    --text-secondary: #4E5969;
-    --border-color: #E5E6EB;
+    --sky-light: #87CEEB;
+    --sky-mid: #5BA3C0;
+    --sky-dark: #2E7D9A;
+    --ocean-light: #B5E3FF;
+    --ocean-mid: #7EC8E3;
+    --ocean-dark: #4A9BBF;
+    --mint: #98FB98;
+    --cream: #FFF8DC;
+    --white-glass: rgba(255, 255, 255, 0.85);
+    --text-primary: #1A3A4A;
+    --text-secondary: #4A6A7A;
+    --border-glass: rgba(255, 255, 255, 0.6);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: var(--primary-gradient);
+    font-family: 'Segoe UI', 'Lucida Sans', 'Arial', sans-serif;
+    background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 50%, #B5E3FF 100%);
     min-height: 100vh;
     padding: 20px;
     padding-top: 100px;
@@ -30,9 +33,11 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 4px 30px rgba(46, 125, 154, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     z-index: 1000;
     padding: 0 20px;
 }
@@ -58,12 +63,13 @@ body {
 .logo-icon {
     width: 40px;
     height: 40px;
-    background: var(--primary-gradient);
-    border-radius: 10px;
+    background: linear-gradient(135deg, var(--sky-light) 0%, var(--ocean-mid) 100%);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .nav-tabs {
@@ -74,27 +80,47 @@ body {
 .nav-tab {
     padding: 10px 20px;
     border: none;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.6);
     color: var(--text-secondary);
     font-size: 15px;
     font-weight: 500;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 16px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 8px;
     position: relative;
+    box-shadow: 0 2px 10px rgba(46, 125, 154, 0.1);
+}
+
+.nav-tab::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, transparent 100%);
+    border-radius: 14px 14px 0 0;
+    pointer-events: none;
 }
 
 .nav-tab:hover {
-    background: var(--bg-light);
+    background: rgba(255, 255, 255, 0.9);
     color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(46, 125, 154, 0.2);
 }
 
 .nav-tab.active {
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, var(--sky-light) 0%, var(--ocean-mid) 100%);
     color: white;
+    box-shadow: 0 4px 20px rgba(135, 206, 235, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.nav-tab.active::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
 }
 
 .nav-tab .tab-icon {
@@ -130,11 +156,30 @@ body {
 
 /* 卡片通用样式 */
 .card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 
+        0 20px 60px rgba(46, 125, 154, 0.15),
+        0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
     padding: 30px;
     margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, transparent 100%);
+    pointer-events: none;
 }
 
 .card-title {
@@ -144,22 +189,27 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    position: relative;
+    z-index: 1;
 }
 
 /* ==================== 密码生成器样式 ==================== */
 .password-display-wrapper {
-    background: var(--bg-light);
-    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(240, 250, 255, 0.5) 100%);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
     padding: 20px;
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 25px rgba(46, 125, 154, 0.1);
 }
 
 .password-display {
     font-size: 24px;
     font-family: 'Courier New', monospace;
-    color: var(--primary-color);
+    color: var(--sky-dark);
     word-break: break-all;
     min-height: 36px;
     transition: all 0.3s ease;
@@ -177,15 +227,17 @@ body {
 .copy-btn {
     width: 100%;
     padding: 14px;
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--sky-light) 0%, var(--ocean-mid) 100%);
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 16px;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    font-weight: 600;
 }
 
 .copy-btn::after {
@@ -195,7 +247,7 @@ body {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
@@ -207,13 +259,13 @@ body {
 }
 
 .copy-btn:hover {
-    background: #0e42d2;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(22, 93, 255, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(135, 206, 235, 0.5);
 }
 
 .copy-btn.copied {
-    background: var(--success-color);
+    background: linear-gradient(135deg, #98FB98 0%, #7CCD7C 100%);
+    box-shadow: 0 4px 15px rgba(152, 251, 152, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .setting-item {
@@ -231,32 +283,35 @@ body {
 
 .length-value {
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--sky-dark);
     font-size: 18px;
 }
 
 input[type="range"] {
     width: 100%;
-    height: 8px;
-    border-radius: 4px;
-    background: var(--border-color);
+    height: 10px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, var(--sky-light) 0%, var(--ocean-mid) 100%);
     outline: none;
     -webkit-appearance: none;
+    box-shadow: inset 0 2px 5px rgba(46, 125, 154, 0.2);
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: linear-gradient(135deg, white 0%, #F0F8FF 100%);
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(46, 125, 154, 0.3);
+    border: 2px solid var(--sky-mid);
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 8px rgba(22, 93, 255, 0.1);
+    transform: scale(1.15);
+    box-shadow: 0 5px 15px rgba(46, 125, 154, 0.4);
 }
 
 .checkbox-grid {
@@ -268,15 +323,19 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .checkbox-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    background: var(--bg-light);
-    border-radius: 10px;
+    padding: 14px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(240, 250, 255, 0.4) 100%);
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 8px rgba(46, 125, 154, 0.08);
 }
 
 .checkbox-item:hover {
-    background: #e8e9ed;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 250, 255, 0.7) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(46, 125, 154, 0.15);
 }
 
 .checkbox-item input {
@@ -284,7 +343,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     height: 20px;
     margin-right: 12px;
     cursor: pointer;
-    accent-color: var(--primary-color);
+    accent-color: var(--sky-dark);
 }
 
 .checkbox-item label {
@@ -297,16 +356,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .generate-btn {
     width: 100%;
     padding: 16px;
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, #87CEEB 0%, #5BA3C0 50%, #7EC8E3 100%);
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 18px;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 6px 25px rgba(135, 206, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .generate-btn::after {
@@ -316,7 +376,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
@@ -328,30 +388,31 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .generate-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(135, 206, 235, 0.5);
 }
 
 .generate-btn:active {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
 }
 
 /* 密码强度指示器 */
 .strength-indicator {
-    height: 6px;
-    border-radius: 3px;
+    height: 8px;
+    border-radius: 4px;
     margin-top: 15px;
-    background: var(--border-color);
+    background: rgba(255, 255, 255, 0.6);
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(46, 125, 154, 0.1);
 }
 
 .strength-bar {
     height: 100%;
     width: 0%;
-    border-radius: 3px;
+    border-radius: 4px;
     transition: all 0.4s ease;
 }
 
-.strength-bar.weak { width: 33%; background: var(--danger-color); }
-.strength-bar.medium { width: 66%; background: var(--warning-color); }
-.strength-bar.strong { width: 100%; background: var(--success-color); }
+.strength-bar.weak { width: 33%; background: linear-gradient(90deg, #FFB347 0%, #FFA07A 100%); }
+.strength-bar.medium { width: 66%; background: linear-gradient(90deg, #98FB98 0%, #7CCD7C 100%); }
+.strength-bar.strong { width: 100%; background: linear-gradient(90deg, #87CEEB 0%, #5BA3C0 100%); }
