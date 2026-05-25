@@ -58,6 +58,51 @@
     color: var(--cns-cyan);
 }
 
+/* 视频工具快捷键提示 */
+.video-shortcut-hint {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), rgba(136, 0, 255, 0.05));
+    border-radius: 8px;
+    margin-top: 20px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.video-shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--cns-text);
+}
+
+.video-shortcut-item .shortcut-label {
+    color: var(--cns-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.video-shortcut-item kbd {
+    padding: 6px 12px;
+    background: var(--cns-bg);
+    border: 1px solid var(--cns-cyan);
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+    font-size: 11px;
+    color: var(--cns-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.video-shortcut-item:hover kbd {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    transform: translateY(-2px);
+}
+
 /* ==================== 装饰图形 ==================== */
 .decoration {
     position: fixed;
