@@ -1,208 +1,243 @@
-/* ==================== 待办清单样式 ==================== */
-.todo-input-section {
+/* ==================== PDF 转换工具样式 ==================== */
+.conversion-modes {
     display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
 }
 
-.todo-input {
+.mode-btn {
     flex: 1;
+    min-width: 120px;
+    padding: 14px 18px;
+    background: transparent;
+    border: 1px solid var(--cns-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--cns-text-dim);
+}
+
+.mode-btn:hover {
+    border-color: var(--cns-cyan);
+    color: var(--cns-cyan);
+    background: rgba(0, 240, 255, 0.05);
+}
+
+.mode-btn.active {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: var(--cns-cyan);
+    color: var(--cns-cyan);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.mode-icon {
+    font-size: 24px;
+}
+
+.mode-btn span:last-child {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.mode-panel {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.mode-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 上传区域 */
+.upload-area {
+    border: 2px dashed var(--cns-border);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--cns-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+    border-color: var(--cns-cyan);
+    background: rgba(0, 240, 255, 0.05);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    filter: grayscale(50%);
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover .upload-icon {
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+.upload-text {
+    font-size: 15px;
+    color: var(--cns-text);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    font-size: 12px;
+    color: var(--cns-text-dim);
+}
+
+/* URL 输入 */
+.url-input-section {
+    margin-bottom: 16px;
+}
+
+.url-input {
+    width: 100%;
     padding: 14px 18px;
     background: var(--cns-bg);
     border: 1px solid var(--cns-border);
     border-radius: 4px;
-    font-size: 15px;
+    font-size: 14px;
     outline: none;
     transition: all 0.3s ease;
     color: var(--cns-text);
     font-family: inherit;
 }
 
-.todo-input:focus {
+.url-input:focus {
     border-color: var(--cns-cyan);
     box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
-.todo-input::placeholder {
+.url-input::placeholder {
     color: var(--cns-text-dim);
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 12px;
 }
 
-.add-btn {
-    padding: 14px 24px;
-    background: linear-gradient(90deg, var(--cns-cyan), var(--cns-purple));
-    color: white;
-    border: none;
+/* HTML 文本框 */
+.html-textarea {
+    width: 100%;
+    height: 150px;
+    padding: 14px 18px;
+    background: var(--cns-bg);
+    border: 1px solid var(--cns-border);
     border-radius: 4px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
+    font-size: 13px;
+    outline: none;
     transition: all 0.3s ease;
-    white-space: nowrap;
+    color: var(--cns-text);
+    font-family: 'Consolas', monospace;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.html-textarea:focus {
+    border-color: var(--cns-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.html-textarea::placeholder {
+    color: var(--cns-text-dim);
     text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    letter-spacing: 1px;
+    font-size: 12px;
 }
 
-.add-btn:hover {
-    box-shadow: 0 0 25px rgba(0, 240, 255, 0.5);
-    transform: translateY(-2px);
-}
-
-.add-btn:active {
-    transform: translateY(0);
-}
-
-.todo-filters {
+/* 选项区域 */
+.options-section {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 20px;
+    margin-top: 16px;
     flex-wrap: wrap;
 }
 
-.filter-btn {
-    padding: 10px 18px;
-    background: transparent;
-    border: 1px solid var(--cns-border);
-    color: var(--cns-text-dim);
-    border-radius: 4px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.filter-btn:hover {
-    border-color: var(--cns-cyan);
-    color: var(--cns-cyan);
-}
-
-.filter-btn.active {
-    background: rgba(0, 240, 255, 0.1);
-    border-color: var(--cns-cyan);
-    color: var(--cns-cyan);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-}
-
-.todo-stats {
-    display: flex;
-    gap: 20px;
-    padding: 18px;
-    background: var(--cns-bg);
-    border-radius: 6px;
-    margin-bottom: 20px;
-    border: 1px solid var(--cns-border);
-}
-
-.stat-item {
-    text-align: center;
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--cns-cyan);
-    transition: all 0.3s ease;
-    text-shadow: var(--cns-glow);
-    font-family: 'Consolas', monospace;
-}
-
-.stat-value.updating {
-    animation: stat-pulse 0.4s ease;
-}
-
-@keyframes stat-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-.stat-label {
-    font-size: 11px;
-    color: var(--cns-text-dim);
-    margin-top: 6px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.todo-list {
-    list-style: none;
-}
-
-.todo-item {
+.option-item {
     display: flex;
     align-items: center;
-    padding: 14px;
-    background: var(--cns-bg);
-    border-radius: 4px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-    animation: slideIn 0.3s ease;
-    border: 1px solid transparent;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.todo-item.completed {
-    opacity: 0.5;
-}
-
-.todo-item.completed .todo-text {
-    text-decoration: line-through;
-    color: var(--cns-text-dim);
-}
-
-.todo-item.removing {
-    animation: slideOut 0.3s ease forwards;
-}
-
-@keyframes slideOut {
-    to {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-}
-
-.todo-item:hover {
-    border-color: var(--cns-border);
-}
-
-.todo-checkbox {
-    width: 20px;
-    height: 20px;
-    margin-right: 14px;
+    gap: 8px;
     cursor: pointer;
+}
+
+.option-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
     accent-color: var(--cns-cyan);
 }
 
-.todo-text {
-    flex: 1;
-    font-size: 14px;
+.option-item span {
+    font-size: 13px;
     color: var(--cns-text);
-    word-break: break-word;
-}
-
-.todo-date {
-    font-size: 11px;
-    color: var(--cns-text-dim);
-    margin-right: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-.todo-delete {
+/* 已上传文件列表 */
+.uploaded-files {
+    margin-top: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: var(--cns-bg);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    border: 1px solid var(--cns-border);
+    transition: all 0.3s ease;
+}
+
+.uploaded-file:hover {
+    border-color: var(--cns-cyan);
+}
+
+.file-icon {
+    font-size: 24px;
+    margin-right: 12px;
+}
+
+.file-info {
+    flex: 1;
+}
+
+.file-name {
+    font-size: 13px;
+    color: var(--cns-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    font-size: 11px;
+    color: var(--cns-text-dim);
+    margin-top: 4px;
+}
+
+.remove-file {
     width: 32px;
     height: 32px;
     border: 1px solid transparent;
@@ -214,66 +249,118 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
 }
 
-.todo-delete:hover {
+.remove-file:hover {
     border-color: #ff4444;
     color: #ff4444;
     background: rgba(255, 68, 68, 0.1);
 }
 
-.empty-state {
+/* 转换按钮 */
+.convert-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, var(--cns-cyan), var(--cns-purple));
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+    margin-top: 25px;
+}
+
+.convert-btn:hover {
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.convert-btn:active {
+    transform: translateY(0);
+}
+
+.convert-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 进度条 */
+.progress-container {
+    margin-top: 20px;
+}
+
+.progress-bar {
+    height: 6px;
+    background: var(--cns-bg);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--cns-border);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cns-cyan), var(--cns-purple));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+    0% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+}
+
+.progress-text {
     text-align: center;
-    padding: 50px 20px;
-}
-
-.empty-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
-    filter: grayscale(100%) brightness(0.5);
-}
-
-.empty-text {
+    font-size: 12px;
     color: var(--cns-text-dim);
-    font-size: 14px;
+    margin-top: 10px;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
 
-/* 导出按钮 */
-.export-section {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
+/* 下载区域 */
+.download-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--cns-green);
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
 }
 
-.export-btn {
-    flex: 1;
-    min-width: 140px;
-    padding: 12px 16px;
-    background: transparent;
-    border: 1px solid var(--cns-border);
-    color: var(--cns-text);
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
+.download-btn {
+    padding: 14px 32px;
+    background: linear-gradient(90deg, var(--cns-green), #00cc6a);
+    color: var(--cns-bg);
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
 }
 
-.export-btn:hover {
-    border-color: var(--cns-cyan);
-    color: var(--cns-cyan);
-    background: rgba(0, 240, 255, 0.05);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+.download-btn:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+    transform: translateY(-2px);
+}
+
+.download-section .file-info {
+    font-size: 12px;
+    color: var(--cns-text-dim);
+    margin-top: 12px;
 }
 
 /* ==================== Toast 通知 ==================== */
@@ -348,150 +435,3 @@
 .toast.success .toast-icon { color: var(--cns-green); }
 .toast.error .toast-icon { color: #ff4444; }
 .toast.info .toast-icon { color: var(--cns-cyan); }
-
-/* ==================== IP转换器样式 ==================== */
-.ip-input-section {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.ip-input-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.ip-label {
-    font-size: 12px;
-    color: var(--cns-text-dim);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ip-input {
-    padding: 14px 16px;
-    background: var(--cns-bg);
-    border: 1px solid var(--cns-border);
-    border-radius: 4px;
-    font-size: 16px;
-    color: var(--cns-text);
-    font-family: 'Consolas', 'Courier New', monospace;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
-}
-
-.ip-input:focus {
-    outline: none;
-    border-color: var(--cns-cyan);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-}
-
-.ip-input::placeholder {
-    color: var(--cns-text-dim);
-    font-size: 14px;
-}
-
-.ip-convert-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(90deg, var(--cns-cyan), var(--cns-purple));
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 20px;
-    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
-}
-
-.ip-convert-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
-}
-
-.ip-results {
-    background: var(--cns-bg);
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid var(--cns-border);
-}
-
-.ip-result-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(0, 240, 255, 0.1);
-}
-
-.ip-result-item:last-child {
-    border-bottom: none;
-}
-
-.ip-result-label {
-    font-size: 13px;
-    color: var(--cns-text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ip-result-value {
-    font-size: 14px;
-    color: var(--cns-cyan);
-    font-family: 'Consolas', 'Courier New', monospace;
-    letter-spacing: 1px;
-    text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
-}
-
-.ip-subnet-section {
-    background: var(--cns-bg);
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid var(--cns-border);
-}
-
-.ip-result-title {
-    font-size: 14px;
-    color: var(--cns-cyan);
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 600;
-}
-
-.ip-info-section {
-    background: rgba(0, 240, 255, 0.05);
-    border-radius: 6px;
-    padding: 18px;
-    border: 1px solid rgba(0, 240, 255, 0.2);
-}
-
-.ip-info-title {
-    font-size: 14px;
-    color: var(--cns-cyan);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.ip-info-text {
-    font-size: 12px;
-    color: var(--cns-text-dim);
-    line-height: 1.8;
-}
-
-.ip-info-text p {
-    margin-bottom: 8px;
-}
-
-.ip-info-text strong {
-    color: var(--cns-text);
-}

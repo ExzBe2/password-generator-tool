@@ -27,12 +27,8 @@
                     <span>密码生成</span>
                 </button>
                 <button class="nav-tab" data-tool="todo">
-                    <span class="tab-icon">✅</span>
-                    <span>待办清单</span>
-                </button>
-                <button class="nav-tab" data-tool="ip">
-                    <span class="tab-icon">🌐</span>
-                    <span>IP转换器</span>
+                    <span class="tab-icon">📄</span>
+                    <span>PDF转换</span>
                 </button>
             </nav>
         </div>
@@ -102,148 +98,105 @@
             </div>
         </section>
 
-        <!-- 待办清单面板 -->
+        <!-- PDF 转换工具面板 -->
         <section class="tool-panel" id="todoPanel">
             <div class="card">
-                <div class="card-title">✅ 待办清单</div>
+                <div class="card-title">📄 PDF 转换工具</div>
                 
-                <div class="todo-input-section">
-                    <input type="text" class="todo-input" id="todoInput" placeholder="输入新任务，按回车添加...">
-                    <button class="add-btn" id="addTodoBtn">➕ 添加</button>
-                </div>
-
-                <div class="todo-filters">
-                    <button class="filter-btn active" data-filter="all">全部</button>
-                    <button class="filter-btn" data-filter="active">待完成</button>
-                    <button class="filter-btn" data-filter="completed">已完成</button>
-                </div>
-
-                <div class="todo-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="totalCount">0</div>
-                        <div class="stat-label">总任务</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="completedCount">0</div>
-                        <div class="stat-label">已完成</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="pendingCount">0</div>
-                        <div class="stat-label">待完成</div>
-                    </div>
-                </div>
-
-                <ul class="todo-list" id="todoList"></ul>
-
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <div class="empty-icon">📝</div>
-                    <div class="empty-text">暂无任务，添加一个吧！</div>
-                </div>
-
-                <div class="chart-section" id="chartSection" style="display: none;">
-                    <div class="chart-title">📊 完成进度</div>
-                    <div class="pie-chart" id="pieChart"></div>
-                    <div class="chart-legend">
-                        <div class="legend-item">
-                            <div class="legend-dot" style="background: var(--success-color);"></div>
-                            <span>已完成</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-dot" style="background: var(--border-color);"></div>
-                            <span>待完成</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="export-section">
-                    <button class="export-btn" id="exportJson">
-                        📥 导出 JSON
+                <!-- 转换模式选择 -->
+                <div class="conversion-modes">
+                    <button class="mode-btn active" data-mode="image-to-pdf">
+                        <span class="mode-icon">🖼️</span>
+                        <span>图片转 PDF</span>
                     </button>
-                    <button class="export-btn" id="exportCsv">
-                        📥 导出 CSV
+                    <button class="mode-btn" data-mode="html-to-pdf">
+                        <span class="mode-icon">🌐</span>
+                        <span>HTML 转 PDF</span>
+                    </button>
+                    <button class="mode-btn" data-mode="merge-pdf">
+                        <span class="mode-icon">📑</span>
+                        <span>合并 PDF</span>
                     </button>
                 </div>
 
-                <div class="shortcut-hint">
-                    快捷键: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 添加任务 | <kbd>Delete</kbd> 删除选中
-                </div>
-            </div>
-        </section>
-
-        <!-- IP转换器面板 -->
-        <section class="tool-panel" id="ipPanel">
-            <div class="card">
-                <div class="card-title">🌐 网络IP转换器</div>
-                
-                <div class="ip-input-section">
-                    <div class="ip-input-group">
-                        <label class="ip-label">输入IP地址</label>
-                        <input type="text" class="ip-input" id="ipInput" placeholder="例如: 192.168.1.1">
+                <!-- 图片转 PDF 模式 -->
+                <div class="mode-panel active" id="imageToPdfPanel">
+                    <div class="upload-area" id="imageUploadArea">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">点击或拖拽图片到此处</div>
+                        <div class="upload-hint">支持 JPG、PNG、GIF 格式</div>
+                        <input type="file" id="imageFileInput" accept="image/*" multiple hidden>
                     </div>
-                    <div class="ip-input-group">
-                        <label class="ip-label">子网掩码 (可选)</label>
-                        <input type="text" class="ip-input" id="subnetInput" placeholder="例如: 255.255.255.0">
+                    
+                    <div class="uploaded-files" id="imageFilesList"></div>
+
+                    <div class="options-section">
+                        <label class="option-item">
+                            <input type="checkbox" id="imageLandscape" checked>
+                            <span>横向布局</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="imageCompress">
+                            <span>压缩图片</span>
+                        </label>
                     </div>
                 </div>
 
-                <button class="ip-convert-btn" id="convertIpBtn">
+                <!-- HTML 转 PDF 模式 -->
+                <div class="mode-panel" id="htmlToPdfPanel">
+                    <div class="url-input-section">
+                        <input type="url" class="url-input" id="htmlUrlInput" placeholder="输入网页 URL...">
+                    </div>
+                    
+                    <textarea class="html-textarea" id="htmlContentInput" placeholder="或直接输入 HTML 内容..."></textarea>
+
+                    <div class="options-section">
+                        <label class="option-item">
+                            <input type="checkbox" id="htmlIncludeBackground" checked>
+                            <span>包含背景</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="checkbox" id="htmlPrintMedia">
+                            <span>使用打印样式</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 合并 PDF 模式 -->
+                <div class="mode-panel" id="mergePdfPanel">
+                    <div class="upload-area" id="pdfUploadArea">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">点击或拖拽 PDF 文件到此处</div>
+                        <div class="upload-hint">支持多个 PDF 文件</div>
+                        <input type="file" id="pdfFileInput" accept=".pdf" multiple hidden>
+                    </div>
+                    
+                    <div class="uploaded-files" id="pdfFilesList"></div>
+                </div>
+
+                <!-- 转换按钮 -->
+                <button class="convert-btn" id="convertBtn">
                     ⚡ 开始转换
                 </button>
 
-                <div class="ip-results" id="ipResults">
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">二进制</span>
-                        <span class="ip-result-value" id="ipBinary">-</span>
+                <!-- 进度条 -->
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
                     </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">十六进制</span>
-                        <span class="ip-result-value" id="ipHex">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">十进制</span>
-                        <span class="ip-result-value" id="ipDecimal">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">八进制</span>
-                        <span class="ip-result-value" id="ipOctal">-</span>
-                    </div>
+                    <div class="progress-text" id="progressText">正在处理...</div>
                 </div>
 
-                <div class="ip-subnet-section" id="subnetResults" style="display: none;">
-                    <div class="ip-result-title">📊 子网计算结果</div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">网络地址</span>
-                        <span class="ip-result-value" id="networkAddr">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">广播地址</span>
-                        <span class="ip-result-value" id="broadcastAddr">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">可用IP范围</span>
-                        <span class="ip-result-value" id="ipRange">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">CIDR表示</span>
-                        <span class="ip-result-value" id="cidrNotation">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">子网位数</span>
-                        <span class="ip-result-value" id="subnetBits">-</span>
-                    </div>
-                    <div class="ip-result-item">
-                        <span class="ip-result-label">可用主机数</span>
-                        <span class="ip-result-value" id="hostCount">-</span>
-                    </div>
+                <!-- 下载区域 -->
+                <div class="download-section" id="downloadSection" style="display: none;">
+                    <button class="download-btn" id="downloadBtn">
+                        📥 下载 PDF
+                    </button>
+                    <div class="file-info" id="fileInfo"></div>
                 </div>
 
-                <div class="ip-info-section">
-                    <div class="ip-info-title">💡 IP地址知识</div>
-                    <div class="ip-info-text">
-                        <p><strong>IPv4地址</strong>：由32位二进制组成，通常分为4个8位十进制数表示（如192.168.1.1）</p>
-                        <p><strong>私有地址</strong>：10.0.0.0-10.255.255.255、172.16.0.0-172.31.255.255、192.168.0.0-192.168.255.255</p>
-                        <p><strong>回环地址</strong>：127.0.0.1 用于本机测试</p>
-                    </div>
+                <div class="shortcut-hint">
+                    快捷键: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 开始转换
                 </div>
             </div>
         </section>

@@ -1,204 +1,430 @@
 /**
- * 待办清单模块
+ * PDF 转换工具模块
  */
-const TodoList = {
-    data: [],
-    filter: 'all',
+const PdfConverter = {
+    mode: 'image-to-pdf',
+    files: [],
     elements: {},
     
     init() {
         this.elements = {
-            input: document.getElementById('todoInput'),
-            addBtn: document.getElementById('addTodoBtn'),
-            list: document.getElementById('todoList'),
-            emptyState: document.getElementById('emptyState'),
-            chartSection: document.getElementById('chartSection'),
-            pieChart: document.getElementById('pieChart'),
-            totalCount: document.getElementById('totalCount'),
-            completedCount: document.getElementById('completedCount'),
-            pendingCount: document.getElementById('pendingCount'),
-            exportJson: document.getElementById('exportJson'),
-            exportCsv: document.getElementById('exportCsv'),
-            filters: document.querySelectorAll('.filter-btn')
+            modeBtns: document.querySelectorAll('.mode-btn'),
+            convertBtn: document.getElementById('convertBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressFill: document.getElementById('progressFill'),
+            progressText: document.getElementById('progressText'),
+            downloadSection: document.getElementById('downloadSection'),
+            fileInfo: document.getElementById('fileInfo'),
+            
+            // 图片转PDF
+            imageUploadArea: document.getElementById('imageUploadArea'),
+            imageFileInput: document.getElementById('imageFileInput'),
+            imageFilesList: document.getElementById('imageFilesList'),
+            imageLandscape: document.getElementById('imageLandscape'),
+            imageCompress: document.getElementById('imageCompress'),
+            
+            // HTML转PDF
+            htmlUrlInput: document.getElementById('htmlUrlInput'),
+            htmlContentInput: document.getElementById('htmlContentInput'),
+            htmlIncludeBackground: document.getElementById('htmlIncludeBackground'),
+            htmlPrintMedia: document.getElementById('htmlPrintMedia'),
+            
+            // PDF合并
+            pdfUploadArea: document.getElementById('pdfUploadArea'),
+            pdfFileInput: document.getElementById('pdfFileInput'),
+            pdfFilesList: document.getElementById('pdfFilesList')
         };
         
-        this.loadFromStorage();
         this.bindEvents();
-        this.render();
     },
     
     bindEvents() {
-        this.elements.addBtn.addEventListener('click', () => this.addTodo());
-        this.elements.input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.addTodo();
-        });
-        
-        this.elements.filters.forEach(btn => {
+        // 模式切换
+        this.elements.modeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                this.filter = btn.dataset.filter;
-                this.elements.filters.forEach(b => b.classList.remove('active'));
+                this.mode = btn.dataset.mode;
+                this.elements.modeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                this.render();
+                
+                // 隐藏所有模式面板
+                document.querySelectorAll('.mode-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                
+                // 显示当前模式面板
+                const panelId = `${this.mode.replace(/-/g, '')}Panel`;
+                const panel = document.getElementById(panelId);
+                if (panel) panel.classList.add('active');
+                
+                // 重置文件列表
+                this.files = [];
+                this.updateFilesList();
+                this.hideDownloadSection();
             });
         });
         
-        this.elements.exportJson.addEventListener('click', () => this.exportAs('json'));
-        this.elements.exportCsv.addEventListener('click', () => this.exportAs('csv'));
-    },
-    
-    loadFromStorage() {
-        const stored = localStorage.getItem('efficiencyTools_todos');
-        if (stored) {
-            this.data = JSON.parse(stored);
-        }
-    },
-    
-    saveToStorage() {
-        localStorage.setItem('efficiencyTools_todos', JSON.stringify(this.data));
-    },
-    
-    addTodo() {
-        const text = this.elements.input.value.trim();
-        
-        if (!text) {
-            Toast.show('请输入任务内容', 'error');
-            return;
-        }
-        
-        const todo = {
-            id: Date.now(),
-            text: text,
-            completed: false,
-            createdAt: new Date().toLocaleDateString('zh-CN')
-        };
-        
-        this.data.unshift(todo);
-        this.saveToStorage();
-        this.elements.input.value = '';
-        this.render();
-        Toast.show('任务添加成功', 'success');
-    },
-    
-    toggleTodo(id) {
-        const todo = this.data.find(t => t.id === id);
-        if (todo) {
-            todo.completed = !todo.completed;
-            this.saveToStorage();
-            this.render();
-        }
-    },
-    
-    deleteTodo(id, element) {
-        element.classList.add('removing');
-        
-        setTimeout(() => {
-            this.data = this.data.filter(t => t.id !== id);
-            this.saveToStorage();
-            this.render();
-            Toast.show('任务已删除', 'info');
-        }, 300);
-    },
-    
-    getFilteredData() {
-        switch (this.filter) {
-            case 'active':
-                return this.data.filter(t => !t.completed);
-            case 'completed':
-                return this.data.filter(t => t.completed);
-            default:
-                return this.data;
-        }
-    },
-    
-    updateStats() {
-        const total = this.data.length;
-        const completed = this.data.filter(t => t.completed).length;
-        const pending = total - completed;
-        
-        ['totalCount', 'completedCount', 'pendingCount'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.classList.add('updating');
-                setTimeout(() => el.classList.remove('updating'), 400);
-            }
+        // 图片上传
+        this.elements.imageUploadArea.addEventListener('click', () => {
+            this.elements.imageFileInput.click();
         });
         
-        this.elements.totalCount.textContent = total;
-        this.elements.completedCount.textContent = completed;
-        this.elements.pendingCount.textContent = pending;
+        this.elements.imageFileInput.addEventListener('change', (e) => {
+            this.handleFiles(e.target.files, 'image');
+        });
         
-        if (total > 0) {
-            this.elements.chartSection.style.display = 'block';
-            const angle = (completed / total) * 360;
-            this.elements.pieChart.style.setProperty('--complete-angle', `${angle}deg`);
-        } else {
-            this.elements.chartSection.style.display = 'none';
-        }
+        // 拖拽上传图片
+        this.elements.imageUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.imageUploadArea.classList.add('dragover');
+        });
+        
+        this.elements.imageUploadArea.addEventListener('dragleave', () => {
+            this.elements.imageUploadArea.classList.remove('dragover');
+        });
+        
+        this.elements.imageUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.imageUploadArea.classList.remove('dragover');
+            this.handleFiles(e.dataTransfer.files, 'image');
+        });
+        
+        // PDF上传
+        this.elements.pdfUploadArea.addEventListener('click', () => {
+            this.elements.pdfFileInput.click();
+        });
+        
+        this.elements.pdfFileInput.addEventListener('change', (e) => {
+            this.handleFiles(e.target.files, 'pdf');
+        });
+        
+        // 拖拽上传PDF
+        this.elements.pdfUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            this.elements.pdfUploadArea.classList.add('dragover');
+        });
+        
+        this.elements.pdfUploadArea.addEventListener('dragleave', () => {
+            this.elements.pdfUploadArea.classList.remove('dragover');
+        });
+        
+        this.elements.pdfUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.pdfUploadArea.classList.remove('dragover');
+            this.handleFiles(e.dataTransfer.files, 'pdf');
+        });
+        
+        // 转换按钮
+        this.elements.convertBtn.addEventListener('click', () => {
+            this.convert();
+        });
+        
+        // 下载按钮
+        this.elements.downloadBtn.addEventListener('click', () => {
+            this.downloadPdf();
+        });
+        
+        // 快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                const activePanel = document.querySelector('.tool-panel.active');
+                if (activePanel && activePanel.id === 'todoPanel') {
+                    e.preventDefault();
+                    this.convert();
+                }
+            }
+        });
     },
     
-    render() {
-        const filtered = this.getFilteredData();
+    handleFiles(files, type) {
+        if (!files || files.length === 0) return;
         
-        if (this.data.length === 0) {
-            this.elements.list.style.display = 'none';
-            this.elements.emptyState.style.display = 'block';
-            this.elements.chartSection.style.display = 'none';
-        } else {
-            this.elements.list.style.display = 'block';
-            this.elements.emptyState.style.display = 'none';
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
             
-            this.elements.list.innerHTML = filtered.map(todo => `
-                <li class="todo-item ${todo.completed ? 'completed' : ''}" data-id="${todo.id}">
-                    <input type="checkbox" class="todo-checkbox" 
-                           ${todo.completed ? 'checked' : ''} 
-                           onchange="TodoList.toggleTodo(${todo.id})">
-                    <span class="todo-text">${this.escapeHtml(todo.text)}</span>
-                    <span class="todo-date">${todo.createdAt}</span>
-                    <button class="todo-delete" onclick="TodoList.deleteTodo(${todo.id}, this.parentElement)">🗑️</button>
-                </li>
-            `).join('');
+            // 验证文件类型
+            if (type === 'image' && !file.type.startsWith('image/')) {
+                Toast.show('请选择图片文件', 'error');
+                continue;
+            }
+            
+            if (type === 'pdf' && file.type !== 'application/pdf') {
+                Toast.show('请选择PDF文件', 'error');
+                continue;
+            }
+            
+            const fileData = {
+                id: Date.now() + i,
+                name: file.name,
+                size: file.size,
+                type: file.type,
+                file: file
+            };
+            
+            this.files.push(fileData);
         }
         
-        this.updateStats();
+        this.updateFilesList();
+        Toast.show(`已添加 ${files.length} 个文件`, 'success');
     },
     
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    },
-    
-    exportAs(format) {
-        if (this.data.length === 0) {
-            Toast.show('没有可导出的数据', 'error');
+    updateFilesList() {
+        const listId = this.mode === 'image-to-pdf' ? 'imageFilesList' : 
+                      (this.mode === 'merge-pdf' ? 'pdfFilesList' : null);
+        
+        if (!listId) {
+            this.files = [];
             return;
         }
         
-        let content, filename, mimeType;
+        const list = document.getElementById(listId);
         
-        if (format === 'json') {
-            content = JSON.stringify(this.data, null, 2);
-            filename = `待办清单_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
-            mimeType = 'application/json';
-        } else {
-            const headers = 'ID,任务内容,完成状态,创建日期';
-            const rows = this.data.map(t => 
-                `${t.id},"${t.text}",${t.completed ? '已完成' : '未完成'},${t.createdAt}`
-            );
-            content = [headers, ...rows].join('\n');
-            filename = `待办清单_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`;
-            mimeType = 'text/csv;charset=utf-8';
+        if (this.files.length === 0) {
+            list.innerHTML = '';
+            return;
         }
         
-        const blob = new Blob(['\ufeff' + content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
+        list.innerHTML = this.files.map((file, index) => `
+            <div class="uploaded-file">
+                <span class="file-icon">${this.mode === 'image-to-pdf' ? '🖼️' : '📄'}</span>
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${this.formatSize(file.size)} - 第 ${index + 1} 页</div>
+                </div>
+                <button class="remove-file" onclick="PdfConverter.removeFile(${file.id})">×</button>
+            </div>
+        `).join('');
+    },
+    
+    removeFile(id) {
+        const index = this.files.findIndex(f => f.id === id);
+        if (index !== -1) {
+            this.files.splice(index, 1);
+            this.updateFilesList();
+            this.hideDownloadSection();
+            Toast.show('文件已移除', 'info');
+        }
+    },
+    
+    formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    },
+    
+    async convert() {
+        this.showProgress(0, '准备转换...');
+        this.hideDownloadSection();
         
-        Toast.show(`已导出为${format.toUpperCase()}文件`, 'success');
+        try {
+            switch (this.mode) {
+                case 'image-to-pdf':
+                    await this.convertImagesToPdf();
+                    break;
+                case 'html-to-pdf':
+                    await this.convertHtmlToPdf();
+                    break;
+                case 'merge-pdf':
+                    await this.mergePdfs();
+                    break;
+            }
+        } catch (error) {
+            console.error('转换失败:', error);
+            Toast.show('转换失败: ' + error.message, 'error');
+            this.hideProgress();
+        }
+    },
+    
+    async convertImagesToPdf() {
+        if (this.files.length === 0) {
+            Toast.show('请先添加图片文件', 'error');
+            this.hideProgress();
+            return;
+        }
+        
+        this.showProgress(10, '正在处理图片...');
+        
+        // 创建一个包含所有图片的HTML页面，然后使用打印功能导出
+        const landscape = this.elements.imageLandscape.checked;
+        
+        // 创建临时容器
+        const tempContainer = document.createElement('div');
+        tempContainer.style.display = 'none';
+        tempContainer.innerHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    @page {
+                        size: ${landscape ? 'landscape' : 'portrait'};
+                        margin: 0;
+                    }
+                    body { margin: 0; }
+                    .page { 
+                        width: 100vw; 
+                        height: 100vh; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        page-break-after: always;
+                    }
+                    img { max-width: 100%; max-height: 100%; object-fit: contain; }
+                </style>
+            </head>
+            <body>
+                ${this.files.map(f => `<div class="page"><img src="${URL.createObjectURL(f.file)}"></div>`).join('')}
+            </body>
+            </html>
+        `;
+        
+        document.body.appendChild(tempContainer);
+        
+        // 使用 iframe 加载并打印
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        return new Promise((resolve) => {
+            iframe.onload = () => {
+                this.showProgress(50, '正在生成PDF...');
+                
+                setTimeout(() => {
+                    iframe.contentWindow.print();
+                    this.showProgress(100, '转换完成');
+                    
+                    setTimeout(() => {
+                        this.hideProgress();
+                        this.showDownloadSection('图片转PDF', `${this.files.length} 页`);
+                        document.body.removeChild(tempContainer);
+                        document.body.removeChild(iframe);
+                        Toast.show('PDF生成成功，请在打印对话框中保存', 'success');
+                        resolve();
+                    }, 1000);
+                }, 500);
+            };
+            
+            iframe.srcdoc = tempContainer.innerHTML;
+        });
+    },
+    
+    async convertHtmlToPdf() {
+        const url = this.elements.htmlUrlInput.value.trim();
+        const htmlContent = this.elements.htmlContentInput.value.trim();
+        
+        if (!url && !htmlContent) {
+            Toast.show('请输入网页URL或HTML内容', 'error');
+            this.hideProgress();
+            return;
+        }
+        
+        this.showProgress(20, '正在处理HTML...');
+        
+        let content = htmlContent;
+        
+        if (url) {
+            try {
+                const response = await fetch(url);
+                content = await response.text();
+            } catch {
+                Toast.show('无法获取网页内容', 'error');
+                this.hideProgress();
+                return;
+            }
+        }
+        
+        const includeBackground = this.elements.htmlIncludeBackground.checked;
+        const usePrintMedia = this.elements.htmlPrintMedia.checked;
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    @media print {
+                        body { -webkit-print-color-adjust: ${includeBackground ? 'exact' : 'none'}; }
+                    }
+                    ${!usePrintMedia ? '@media screen { body { display: none; } }' : ''}
+                </style>
+            </head>
+            <body>${content}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        
+        this.showProgress(60, '正在生成PDF...');
+        
+        return new Promise((resolve) => {
+            printWindow.onload = () => {
+                setTimeout(() => {
+                    printWindow.print();
+                    this.showProgress(100, '转换完成');
+                    
+                    setTimeout(() => {
+                        this.hideProgress();
+                        this.showDownloadSection('HTML转PDF', '1 页');
+                        Toast.show('PDF生成成功，请在打印对话框中保存', 'success');
+                        resolve();
+                    }, 1000);
+                }, 1000);
+            };
+        });
+    },
+    
+    async mergePdfs() {
+        if (this.files.length === 0) {
+            Toast.show('请先添加PDF文件', 'error');
+            this.hideProgress();
+            return;
+        }
+        
+        if (this.files.length === 1) {
+            Toast.show('请添加多个PDF文件进行合并', 'error');
+            this.hideProgress();
+            return;
+        }
+        
+        this.showProgress(30, '准备合并...');
+        
+        // 前端合并PDF需要PDF.js库，这里提供替代方案
+        setTimeout(() => {
+            this.hideProgress();
+            Toast.show('PDF合并需要安装PDF.js库', 'info');
+            this.showDownloadSection('合并PDF', `${this.files.length} 个文件`);
+            
+            // 创建一个简单的下载链接，提示用户使用其他工具
+            this.elements.downloadBtn.onclick = () => {
+                Toast.show('请使用专业PDF工具合并文件', 'info');
+            };
+        }, 500);
+    },
+    
+    downloadPdf() {
+        // 实际的下载逻辑已在转换过程中处理
+        Toast.show('请在打印对话框中选择"保存为PDF"', 'info');
+    },
+    
+    showProgress(percent, text) {
+        this.elements.progressContainer.style.display = 'block';
+        this.elements.progressFill.style.width = percent + '%';
+        this.elements.progressText.textContent = text;
+        this.elements.convertBtn.disabled = true;
+    },
+    
+    hideProgress() {
+        this.elements.progressContainer.style.display = 'none';
+        this.elements.convertBtn.disabled = false;
+    },
+    
+    showDownloadSection(title, info) {
+        this.elements.downloadSection.style.display = 'block';
+        this.elements.fileInfo.textContent = `${title} - ${info}`;
+    },
+    
+    hideDownloadSection() {
+        this.elements.downloadSection.style.display = 'none';
     }
 };
 
@@ -244,180 +470,13 @@ const Shortcuts = {
                 document.querySelector('[data-tool="password"]').click();
                 PasswordGenerator.generate();
             }
-            
-            if (e.ctrlKey && e.key === 'Enter') {
-                const activePanel = document.querySelector('.tool-panel.active');
-                if (activePanel && activePanel.id === 'todoPanel') {
-                    e.preventDefault();
-                    TodoList.addTodo();
-                }
-            }
         });
-    }
-};
-
-/**
- * IP转换器模块
- */
-const IPConverter = {
-    elements: {},
-    
-    init() {
-        this.elements = {
-            ipInput: document.getElementById('ipInput'),
-            subnetInput: document.getElementById('subnetInput'),
-            convertBtn: document.getElementById('convertIpBtn'),
-            ipBinary: document.getElementById('ipBinary'),
-            ipHex: document.getElementById('ipHex'),
-            ipDecimal: document.getElementById('ipDecimal'),
-            ipOctal: document.getElementById('ipOctal'),
-            subnetResults: document.getElementById('subnetResults'),
-            networkAddr: document.getElementById('networkAddr'),
-            broadcastAddr: document.getElementById('broadcastAddr'),
-            ipRange: document.getElementById('ipRange'),
-            cidrNotation: document.getElementById('cidrNotation'),
-            subnetBits: document.getElementById('subnetBits'),
-            hostCount: document.getElementById('hostCount')
-        };
-        
-        this.bindEvents();
-    },
-    
-    bindEvents() {
-        this.elements.convertBtn.addEventListener('click', () => this.convert());
-        this.elements.ipInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.convert();
-        });
-        this.elements.subnetInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.convert();
-        });
-    },
-    
-    validateIP(ip) {
-        const pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-        const match = ip.match(pattern);
-        if (!match) return false;
-        
-        for (let i = 1; i <= 4; i++) {
-            if (parseInt(match[i]) > 255) return false;
-        }
-        return true;
-    },
-    
-    validateSubnet(subnet) {
-        if (!subnet) return true;
-        if (!this.validateIP(subnet)) return false;
-        
-        const octets = subnet.split('.').map(Number);
-        const binary = octets.map(o => o.toString(2).padStart(8, '0')).join('');
-        
-        // 检查是否为有效的子网掩码 (连续的1后面跟连续的0)
-        if (!/^1+0+$/.test(binary)) return false;
-        return true;
-    },
-    
-    ipToInt(ip) {
-        const octets = ip.split('.').map(Number);
-        return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3];
-    },
-    
-    intToIp(num) {
-        return [
-            (num >>> 24) & 255,
-            (num >>> 16) & 255,
-            (num >>> 8) & 255,
-            num & 255
-        ].join('.');
-    },
-    
-    convert() {
-        const ip = this.elements.ipInput.value.trim();
-        const subnet = this.elements.subnetInput.value.trim();
-        
-        if (!ip) {
-            Toast.show('请输入IP地址', 'error');
-            return;
-        }
-        
-        if (!this.validateIP(ip)) {
-            Toast.show('IP地址格式不正确', 'error');
-            return;
-        }
-        
-        // 基础转换
-        const octets = ip.split('.').map(Number);
-        
-        // 二进制
-        const binary = octets.map(o => o.toString(2).padStart(8, '0')).join('.');
-        this.elements.ipBinary.textContent = binary;
-        
-        // 十六进制
-        const hex = octets.map(o => o.toString(16).toUpperCase().padStart(2, '0')).join(':');
-        this.elements.ipHex.textContent = hex;
-        
-        // 十进制
-        const decimal = this.ipToInt(ip);
-        this.elements.ipDecimal.textContent = decimal.toString();
-        
-        // 八进制
-        const octal = octets.map(o => parseInt(o).toString(8).padStart(3, '0')).join('.');
-        this.elements.ipOctal.textContent = octal;
-        
-        // 子网计算
-        if (subnet) {
-            if (!this.validateSubnet(subnet)) {
-                Toast.show('子网掩码格式不正确', 'error');
-                this.elements.subnetResults.style.display = 'none';
-            } else {
-                this.calculateSubnet(ip, subnet);
-            }
-        } else {
-            this.elements.subnetResults.style.display = 'none';
-        }
-        
-        Toast.show('转换成功', 'success');
-    },
-    
-    calculateSubnet(ip, subnet) {
-        const ipInt = this.ipToInt(ip);
-        const subnetInt = this.ipToInt(subnet);
-        
-        // 计算网络地址
-        const networkInt = ipInt & subnetInt;
-        const networkAddr = this.intToIp(networkInt);
-        
-        // 计算广播地址
-        const wildcardInt = ~subnetInt >>> 0;
-        const broadcastInt = networkInt | wildcardInt;
-        const broadcastAddr = this.intToIp(broadcastInt);
-        
-        // 计算CIDR
-        const subnetBinary = subnet.split('.').map(o => o.toString(2).padStart(8, '0')).join('');
-        const cidrBits = subnetBinary.split('1').length - 1;
-        
-        // 计算可用主机数
-        const hostBits = 32 - cidrBits;
-        const hostCount = Math.pow(2, hostBits) - 2;
-        
-        // IP范围
-        const firstIP = cidrBits === 32 ? networkAddr : this.intToIp(networkInt + 1);
-        const lastIP = cidrBits === 32 ? broadcastAddr : this.intToIp(broadcastInt - 1);
-        
-        // 显示结果
-        this.elements.subnetResults.style.display = 'block';
-        this.elements.networkAddr.textContent = networkAddr;
-        this.elements.broadcastAddr.textContent = broadcastAddr;
-        this.elements.ipRange.textContent = `${firstIP} ~ ${lastIP}`;
-        this.elements.cidrNotation.textContent = `${networkAddr}/${cidrBits}`;
-        this.elements.subnetBits.textContent = cidrBits.toString();
-        this.elements.hostCount.textContent = hostCount > 0 ? hostCount.toLocaleString() : '0';
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     Navigation.init();
     PasswordGenerator.init();
-    TodoList.init();
-    IPConverter.init();
+    PdfConverter.init();
     Shortcuts.init();
 });
