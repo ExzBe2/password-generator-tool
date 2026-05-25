@@ -30,6 +30,10 @@
                     <span class="tab-icon">✅</span>
                     <span>待办清单</span>
                 </button>
+                <button class="nav-tab" data-tool="ip">
+                    <span class="tab-icon">🌐</span>
+                    <span>IP转换器</span>
+                </button>
             </nav>
         </div>
     </header>
@@ -162,6 +166,84 @@
 
                 <div class="shortcut-hint">
                     快捷键: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 添加任务 | <kbd>Delete</kbd> 删除选中
+                </div>
+            </div>
+        </section>
+
+        <!-- IP转换器面板 -->
+        <section class="tool-panel" id="ipPanel">
+            <div class="card">
+                <div class="card-title">🌐 网络IP转换器</div>
+                
+                <div class="ip-input-section">
+                    <div class="ip-input-group">
+                        <label class="ip-label">输入IP地址</label>
+                        <input type="text" class="ip-input" id="ipInput" placeholder="例如: 192.168.1.1">
+                    </div>
+                    <div class="ip-input-group">
+                        <label class="ip-label">子网掩码 (可选)</label>
+                        <input type="text" class="ip-input" id="subnetInput" placeholder="例如: 255.255.255.0">
+                    </div>
+                </div>
+
+                <button class="ip-convert-btn" id="convertIpBtn">
+                    ⚡ 开始转换
+                </button>
+
+                <div class="ip-results" id="ipResults">
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">二进制</span>
+                        <span class="ip-result-value" id="ipBinary">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">十六进制</span>
+                        <span class="ip-result-value" id="ipHex">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">十进制</span>
+                        <span class="ip-result-value" id="ipDecimal">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">八进制</span>
+                        <span class="ip-result-value" id="ipOctal">-</span>
+                    </div>
+                </div>
+
+                <div class="ip-subnet-section" id="subnetResults" style="display: none;">
+                    <div class="ip-result-title">📊 子网计算结果</div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">网络地址</span>
+                        <span class="ip-result-value" id="networkAddr">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">广播地址</span>
+                        <span class="ip-result-value" id="broadcastAddr">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">可用IP范围</span>
+                        <span class="ip-result-value" id="ipRange">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">CIDR表示</span>
+                        <span class="ip-result-value" id="cidrNotation">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">子网位数</span>
+                        <span class="ip-result-value" id="subnetBits">-</span>
+                    </div>
+                    <div class="ip-result-item">
+                        <span class="ip-result-label">可用主机数</span>
+                        <span class="ip-result-value" id="hostCount">-</span>
+                    </div>
+                </div>
+
+                <div class="ip-info-section">
+                    <div class="ip-info-title">💡 IP地址知识</div>
+                    <div class="ip-info-text">
+                        <p><strong>IPv4地址</strong>：由32位二进制组成，通常分为4个8位十进制数表示（如192.168.1.1）</p>
+                        <p><strong>私有地址</strong>：10.0.0.0-10.255.255.255、172.16.0.0-172.31.255.255、192.168.0.0-192.168.255.255</p>
+                        <p><strong>回环地址</strong>：127.0.0.1 用于本机测试</p>
+                    </div>
                 </div>
             </div>
         </section>

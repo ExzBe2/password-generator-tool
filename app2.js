@@ -256,9 +256,168 @@ const Shortcuts = {
     }
 };
 
+/**
+ * IP转换器模块
+ */
+const IPConverter = {
+    elements: {},
+    
+    init() {
+        this.elements = {
+            ipInput: document.getElementById('ipInput'),
+            subnetInput: document.getElementById('subnetInput'),
+            convertBtn: document.getElementById('convertIpBtn'),
+            ipBinary: document.getElementById('ipBinary'),
+            ipHex: document.getElementById('ipHex'),
+            ipDecimal: document.getElementById('ipDecimal'),
+            ipOctal: document.getElementById('ipOctal'),
+            subnetResults: document.getElementById('subnetResults'),
+            networkAddr: document.getElementById('networkAddr'),
+            broadcastAddr: document.getElementById('broadcastAddr'),
+            ipRange: document.getElementById('ipRange'),
+            cidrNotation: document.getElementById('cidrNotation'),
+            subnetBits: document.getElementById('subnetBits'),
+            hostCount: document.getElementById('hostCount')
+        };
+        
+        this.bindEvents();
+    },
+    
+    bindEvents() {
+        this.elements.convertBtn.addEventListener('click', () => this.convert());
+        this.elements.ipInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.convert();
+        });
+        this.elements.subnetInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.convert();
+        });
+    },
+    
+    validateIP(ip) {
+        const pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+        const match = ip.match(pattern);
+        if (!match) return false;
+        
+        for (let i = 1; i <= 4; i++) {
+            if (parseInt(match[i]) > 255) return false;
+        }
+        return true;
+    },
+    
+    validateSubnet(subnet) {
+        if (!subnet) return true;
+        if (!this.validateIP(subnet)) return false;
+        
+        const octets = subnet.split('.').map(Number);
+        const binary = octets.map(o => o.toString(2).padStart(8, '0')).join('');
+        
+        // 检查是否为有效的子网掩码 (连续的1后面跟连续的0)
+        if (!/^1+0+$/.test(binary)) return false;
+        return true;
+    },
+    
+    ipToInt(ip) {
+        const octets = ip.split('.').map(Number);
+        return (octets[0] << 24) + (octets[1] << 16) + (octets[2] << 8) + octets[3];
+    },
+    
+    intToIp(num) {
+        return [
+            (num >>> 24) & 255,
+            (num >>> 16) & 255,
+            (num >>> 8) & 255,
+            num & 255
+        ].join('.');
+    },
+    
+    convert() {
+        const ip = this.elements.ipInput.value.trim();
+        const subnet = this.elements.subnetInput.value.trim();
+        
+        if (!ip) {
+            Toast.show('请输入IP地址', 'error');
+            return;
+        }
+        
+        if (!this.validateIP(ip)) {
+            Toast.show('IP地址格式不正确', 'error');
+            return;
+        }
+        
+        // 基础转换
+        const octets = ip.split('.').map(Number);
+        
+        // 二进制
+        const binary = octets.map(o => o.toString(2).padStart(8, '0')).join('.');
+        this.elements.ipBinary.textContent = binary;
+        
+        // 十六进制
+        const hex = octets.map(o => o.toString(16).toUpperCase().padStart(2, '0')).join(':');
+        this.elements.ipHex.textContent = hex;
+        
+        // 十进制
+        const decimal = this.ipToInt(ip);
+        this.elements.ipDecimal.textContent = decimal.toString();
+        
+        // 八进制
+        const octal = octets.map(o => parseInt(o).toString(8).padStart(3, '0')).join('.');
+        this.elements.ipOctal.textContent = octal;
+        
+        // 子网计算
+        if (subnet) {
+            if (!this.validateSubnet(subnet)) {
+                Toast.show('子网掩码格式不正确', 'error');
+                this.elements.subnetResults.style.display = 'none';
+            } else {
+                this.calculateSubnet(ip, subnet);
+            }
+        } else {
+            this.elements.subnetResults.style.display = 'none';
+        }
+        
+        Toast.show('转换成功', 'success');
+    },
+    
+    calculateSubnet(ip, subnet) {
+        const ipInt = this.ipToInt(ip);
+        const subnetInt = this.ipToInt(subnet);
+        
+        // 计算网络地址
+        const networkInt = ipInt & subnetInt;
+        const networkAddr = this.intToIp(networkInt);
+        
+        // 计算广播地址
+        const wildcardInt = ~subnetInt >>> 0;
+        const broadcastInt = networkInt | wildcardInt;
+        const broadcastAddr = this.intToIp(broadcastInt);
+        
+        // 计算CIDR
+        const subnetBinary = subnet.split('.').map(o => o.toString(2).padStart(8, '0')).join('');
+        const cidrBits = subnetBinary.split('1').length - 1;
+        
+        // 计算可用主机数
+        const hostBits = 32 - cidrBits;
+        const hostCount = Math.pow(2, hostBits) - 2;
+        
+        // IP范围
+        const firstIP = cidrBits === 32 ? networkAddr : this.intToIp(networkInt + 1);
+        const lastIP = cidrBits === 32 ? broadcastAddr : this.intToIp(broadcastInt - 1);
+        
+        // 显示结果
+        this.elements.subnetResults.style.display = 'block';
+        this.elements.networkAddr.textContent = networkAddr;
+        this.elements.broadcastAddr.textContent = broadcastAddr;
+        this.elements.ipRange.textContent = `${firstIP} ~ ${lastIP}`;
+        this.elements.cidrNotation.textContent = `${networkAddr}/${cidrBits}`;
+        this.elements.subnetBits.textContent = cidrBits.toString();
+        this.elements.hostCount.textContent = hostCount > 0 ? hostCount.toLocaleString() : '0';
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     Navigation.init();
     PasswordGenerator.init();
     TodoList.init();
+    IPConverter.init();
     Shortcuts.init();
 });

@@ -348,3 +348,150 @@
 .toast.success .toast-icon { color: var(--cns-green); }
 .toast.error .toast-icon { color: #ff4444; }
 .toast.info .toast-icon { color: var(--cns-cyan); }
+
+/* ==================== IP转换器样式 ==================== */
+.ip-input-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ip-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.ip-label {
+    font-size: 12px;
+    color: var(--cns-text-dim);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ip-input {
+    padding: 14px 16px;
+    background: var(--cns-bg);
+    border: 1px solid var(--cns-border);
+    border-radius: 4px;
+    font-size: 16px;
+    color: var(--cns-text);
+    font-family: 'Consolas', 'Courier New', monospace;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.ip-input:focus {
+    outline: none;
+    border-color: var(--cns-cyan);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.ip-input::placeholder {
+    color: var(--cns-text-dim);
+    font-size: 14px;
+}
+
+.ip-convert-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, var(--cns-cyan), var(--cns-purple));
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.ip-convert-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+}
+
+.ip-results {
+    background: var(--cns-bg);
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--cns-border);
+}
+
+.ip-result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+}
+
+.ip-result-item:last-child {
+    border-bottom: none;
+}
+
+.ip-result-label {
+    font-size: 13px;
+    color: var(--cns-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ip-result-value {
+    font-size: 14px;
+    color: var(--cns-cyan);
+    font-family: 'Consolas', 'Courier New', monospace;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+.ip-subnet-section {
+    background: var(--cns-bg);
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid var(--cns-border);
+}
+
+.ip-result-title {
+    font-size: 14px;
+    color: var(--cns-cyan);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.ip-info-section {
+    background: rgba(0, 240, 255, 0.05);
+    border-radius: 6px;
+    padding: 18px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+}
+
+.ip-info-title {
+    font-size: 14px;
+    color: var(--cns-cyan);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ip-info-text {
+    font-size: 12px;
+    color: var(--cns-text-dim);
+    line-height: 1.8;
+}
+
+.ip-info-text p {
+    margin-bottom: 8px;
+}
+
+.ip-info-text strong {
+    color: var(--cns-text);
+}
