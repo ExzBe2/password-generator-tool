@@ -425,6 +425,304 @@ const DocConverter = {
 };
 
 /**
+ * 视频下载工具模块
+ */
+const VideoDownloader = {
+    elements: {},
+    currentVideo: null,
+    selectedFormat: null,
+    
+    init() {
+        this.elements = {
+            urlInput: document.getElementById('videoUrlInput'),
+            preview: document.getElementById('videoPreview'),
+            previewImage: document.getElementById('previewImage'),
+            videoTitle: document.getElementById('videoTitle'),
+            videoAuthor: document.getElementById('videoAuthor'),
+            videoDuration: document.getElementById('videoDuration'),
+            formatOptions: document.getElementById('formatOptions'),
+            downloadBtn: document.getElementById('videoDownloadBtn'),
+            progressContainer: document.getElementById('videoProgressContainer'),
+            progressFill: document.getElementById('videoProgressFill'),
+            progressText: document.getElementById('videoProgressText'),
+            downloadHistory: document.getElementById('downloadHistory')
+        };
+        
+        this.bindEvents();
+        this.loadHistory();
+    },
+    
+    bindEvents() {
+        // 输入链接后按回车解析
+        this.elements.urlInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                this.parseUrl();
+            }
+        });
+        
+        // 下载按钮
+        this.elements.downloadBtn.addEventListener('click', () => {
+            this.downloadVideo();
+        });
+        
+        // 快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') {
+                const activePanel = document.querySelector('.tool-panel.active');
+                if (activePanel && activePanel.id === 'videoPanel') {
+                    e.preventDefault();
+                    this.downloadVideo();
+                }
+            }
+        });
+    },
+    
+    async parseUrl() {
+        const url = this.elements.urlInput.value.trim();
+        
+        if (!url) {
+            Toast.show('请输入视频链接', 'error');
+            return;
+        }
+        
+        // 验证URL格式
+        if (!this.isValidUrl(url)) {
+            Toast.show('请输入有效的视频链接', 'error');
+            return;
+        }
+        
+        this.showProgress(10, '正在解析链接...');
+        
+        // 模拟解析过程
+        await this.simulateProgress(30, '识别视频平台...');
+        
+        // 获取视频信息（模拟）
+        const videoInfo = this.getMockVideoInfo(url);
+        this.currentVideo = videoInfo;
+        
+        await this.simulateProgress(60, '获取视频信息...');
+        
+        // 显示预览
+        this.showPreview(videoInfo);
+        
+        await this.simulateProgress(80, '获取可用格式...');
+        
+        // 显示格式选项
+        this.showFormatOptions(videoInfo.formats);
+        
+        await this.simulateProgress(100, '解析完成');
+        
+        this.hideProgress();
+        Toast.show('视频解析成功！', 'success');
+    },
+    
+    isValidUrl(string) {
+        try {
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    },
+    
+    getMockVideoInfo(url) {
+        // 根据URL判断平台
+        let platform = '未知平台';
+        let thumbnail = 'https://via.placeholder.com/400x225?text=Video+Thumbnail';
+        
+        if (url.includes('youtube')) {
+            platform = 'YouTube';
+            thumbnail = 'https://picsum.photos/400/225?random=1';
+        } else if (url.includes('bilibili') || url.includes('b站')) {
+            platform = 'Bilibili';
+            thumbnail = 'https://picsum.photos/400/225?random=2';
+        } else if (url.includes('douyin') || url.includes('tiktok')) {
+            platform = '抖音/TikTok';
+            thumbnail = 'https://picsum.photos/400/225?random=3';
+        } else if (url.includes('kuaishou')) {
+            platform = '快手';
+            thumbnail = 'https://picsum.photos/400/225?random=4';
+        } else if (url.includes('weibo')) {
+            platform = '微博';
+            thumbnail = 'https://picsum.photos/400/225?random=5';
+        } else if (url.includes('xiaohongshu')) {
+            platform = '小红书';
+            thumbnail = 'https://picsum.photos/400/225?random=6';
+        }
+        
+        return {
+            title: '示例视频标题 - 这是一个精彩的视频内容',
+            author: '视频作者 @username',
+            duration: '03:45',
+            thumbnail: thumbnail,
+            platform: platform,
+            formats: [
+                { quality: '1080P', size: '25.6 MB', url: '#', id: '1080' },
+                { quality: '720P', size: '15.2 MB', url: '#', id: '720' },
+                { quality: '480P', size: '8.5 MB', url: '#', id: '480' },
+                { quality: '360P', size: '4.2 MB', url: '#', id: '360' }
+            ]
+        };
+    },
+    
+    showPreview(info) {
+        this.elements.preview.style.display = 'block';
+        this.elements.previewImage.src = info.thumbnail;
+        this.elements.videoTitle.textContent = info.title;
+        this.elements.videoAuthor.textContent = `${info.author} | ${info.platform}`;
+        this.elements.videoDuration.textContent = `时长: ${info.duration}`;
+    },
+    
+    showFormatOptions(formats) {
+        this.elements.formatOptions.innerHTML = formats.map((format, index) => `
+            <div class="format-option ${index === 0 ? 'active' : ''}" data-format="${format.id}" data-url="${format.url}">
+                <span class="format-quality">${format.quality}</span>
+                <span class="format-size">${format.size}</span>
+            </div>
+        `).join('');
+        
+        // 设置默认选中
+        this.selectedFormat = formats[0];
+        
+        // 绑定格式选择事件
+        document.querySelectorAll('.format-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.format-option').forEach(o => o.classList.remove('active'));
+                option.classList.add('active');
+                
+                const formatId = option.dataset.format;
+                this.selectedFormat = formats.find(f => f.id === formatId);
+            });
+        });
+        
+        // 启用下载按钮
+        this.elements.downloadBtn.disabled = false;
+    },
+    
+    async downloadVideo() {
+        if (!this.currentVideo || !this.selectedFormat) {
+            Toast.show('请先解析视频链接', 'error');
+            return;
+        }
+        
+        this.showProgress(0, '准备下载...');
+        
+        await this.simulateProgress(30, '连接服务器...');
+        await this.simulateProgress(60, '正在下载...');
+        await this.simulateProgress(90, '处理文件...');
+        await this.simulateProgress(100, '下载完成');
+        
+        this.hideProgress();
+        
+        // 模拟下载
+        const content = `视频下载模拟文件
+标题: ${this.currentVideo.title}
+画质: ${this.selectedFormat.quality}
+大小: ${this.selectedFormat.size}
+下载时间: ${new Date().toLocaleString('zh-CN')}
+`;
+        
+        const blob = new Blob([content], { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.currentVideo.title.substring(0, 20)}.mp4`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        // 添加到历史记录
+        this.addToHistory(this.currentVideo.title, this.selectedFormat.quality);
+        
+        Toast.show('视频下载成功！', 'success');
+    },
+    
+    addToHistory(title, quality) {
+        const history = this.getHistory();
+        const record = {
+            id: Date.now(),
+            title: title,
+            quality: quality,
+            time: new Date().toLocaleString('zh-CN')
+        };
+        
+        history.unshift(record);
+        
+        // 只保留最近10条记录
+        if (history.length > 10) {
+            history.pop();
+        }
+        
+        localStorage.setItem('video_download_history', JSON.stringify(history));
+        this.loadHistory();
+    },
+    
+    getHistory() {
+        const stored = localStorage.getItem('video_download_history');
+        return stored ? JSON.parse(stored) : [];
+    },
+    
+    loadHistory() {
+        const history = this.getHistory();
+        
+        if (history.length === 0) {
+            this.elements.downloadHistory.innerHTML = '<li style="text-align: center; color: var(--cns-text-dim); padding: 10px;">暂无下载记录</li>';
+            return;
+        }
+        
+        this.elements.downloadHistory.innerHTML = history.map(record => `
+            <li class="history-item">
+                <span class="history-icon">📹</span>
+                <div class="history-info">
+                    <div class="history-title-text">${record.title}</div>
+                    <div class="history-time">${record.quality} | ${record.time}</div>
+                </div>
+                <button class="history-delete" onclick="VideoDownloader.deleteHistory(${record.id})">×</button>
+            </li>
+        `).join('');
+    },
+    
+    deleteHistory(id) {
+        const history = this.getHistory().filter(item => item.id !== id);
+        localStorage.setItem('video_download_history', JSON.stringify(history));
+        this.loadHistory();
+        Toast.show('记录已删除', 'info');
+    },
+    
+    simulateProgress(targetPercent, message) {
+        return new Promise((resolve) => {
+            const currentPercent = parseInt(this.elements.progressFill.style.width) || 0;
+            const steps = 10;
+            const increment = (targetPercent - currentPercent) / steps;
+            let currentStep = 0;
+            
+            const interval = setInterval(() => {
+                currentStep++;
+                const newPercent = Math.min(currentPercent + increment * currentStep, targetPercent);
+                this.elements.progressFill.style.width = newPercent + '%';
+                this.elements.progressText.textContent = message;
+                
+                if (currentStep >= steps) {
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 80);
+        });
+    },
+    
+    showProgress(percent, text) {
+        this.elements.progressContainer.style.display = 'block';
+        this.elements.progressFill.style.width = percent + '%';
+        this.elements.progressText.textContent = text;
+        this.elements.downloadBtn.disabled = true;
+    },
+    
+    hideProgress() {
+        this.elements.progressContainer.style.display = 'none';
+        this.elements.downloadBtn.disabled = false;
+    }
+};
+
+/**
  * 导航控制
  */
 const Navigation = {
@@ -474,5 +772,6 @@ document.addEventListener('DOMContentLoaded', () => {
     Navigation.init();
     PasswordGenerator.init();
     DocConverter.init();
+    VideoDownloader.init();
     Shortcuts.init();
 });

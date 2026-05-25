@@ -30,9 +30,9 @@
                     <span class="tab-icon">📝</span>
                     <span>文档转换</span>
                 </button>
-                <button class="nav-tab" data-tool="pixelart">
-                    <span class="tab-icon">🎨</span>
-                    <span>像素艺术</span>
+                <button class="nav-tab" data-tool="video">
+                    <span class="tab-icon">📹</span>
+                    <span>视频下载</span>
                 </button>
             </nav>
         </div>
@@ -219,77 +219,66 @@
             </div>
         </section>
 
-        <!-- 像素艺术面板 -->
-        <section class="tool-panel" id="pixelartPanel">
+        <!-- 视频下载工具面板 -->
+        <section class="tool-panel" id="videoPanel">
             <div class="card">
-                <div class="card-title">🎨 像素艺术 - 科比像素画生成器</div>
+                <div class="card-title">📹 视频链接爬取工具</div>
                 
-                <div class="pixel-container">
-                    <!-- 上传区域 -->
-                    <div class="upload-area" id="pixelUploadArea">
-                        <div class="upload-icon">🖼️</div>
-                        <div class="upload-text">点击或拖拽图片到此处</div>
-                        <div class="upload-hint">支持 JPG、PNG、GIF 格式</div>
-                        <input type="file" id="pixelFileInput" accept="image/*" hidden>
+                <!-- 支持的平台 -->
+                <div class="video-platforms">
+                    <div class="platform-tag">YouTube</div>
+                    <div class="platform-tag">Bilibili</div>
+                    <div class="platform-tag">抖音</div>
+                    <div class="platform-tag">快手</div>
+                    <div class="platform-tag">微博</div>
+                    <div class="platform-tag">小红书</div>
+                </div>
+
+                <!-- 输入区域 -->
+                <div class="url-input-section">
+                    <input type="url" class="video-url-input" id="videoUrlInput" placeholder="请输入视频链接...">
+                </div>
+
+                <!-- 预览区域 -->
+                <div class="video-preview" id="videoPreview" style="display: none;">
+                    <div class="preview-thumbnail">
+                        <img id="previewImage" src="" alt="视频封面">
+                        <div class="play-overlay">▶</div>
                     </div>
-                    
-                    <!-- 图片预览区域 -->
-                    <div class="preview-section">
-                        <div class="preview-box">
-                            <div class="preview-label">原始图片</div>
-                            <div class="preview-image" id="originalImage">
-                                <div class="no-image">📷</div>
-                            </div>
-                        </div>
-                        <div class="preview-box">
-                            <div class="preview-label">科比像素画</div>
-                            <div class="preview-image" id="pixelImage">
-                                <div class="no-image">🎨</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 参数设置 -->
-                    <div class="pixel-settings">
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <span>像素大小</span>
-                                <span class="length-value" id="pixelSizeValue">8</span>
-                            </div>
-                            <input type="range" id="pixelSizeSlider" min="4" max="20" value="8">
-                        </div>
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <span>输出尺寸</span>
-                                <span class="length-value" id="outputSizeValue">500</span>
-                            </div>
-                            <input type="range" id="outputSizeSlider" min="200" max="800" step="50" value="500">
-                        </div>
-                    </div>
-                    
-                    <!-- 转换按钮 -->
-                    <button class="convert-btn" id="pixelConvertBtn">
-                        ⚡ 生成科比像素画
-                    </button>
-                    
-                    <!-- 进度条 -->
-                    <div class="progress-container" id="pixelProgressContainer" style="display: none;">
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="pixelProgressFill"></div>
-                        </div>
-                        <div class="progress-text" id="pixelProgressText">正在生成...</div>
-                    </div>
-                    
-                    <!-- 下载区域 -->
-                    <div class="download-section" id="pixelDownloadSection" style="display: none;">
-                        <button class="download-btn" id="pixelDownloadBtn">
-                            📥 下载像素画
-                        </button>
+                    <div class="preview-info">
+                        <h3 id="videoTitle" class="video-title"></h3>
+                        <p id="videoAuthor" class="video-author"></p>
+                        <p id="videoDuration" class="video-duration"></p>
                     </div>
                 </div>
-                
+
+                <!-- 格式选择 -->
+                <div class="format-section">
+                    <div class="format-label">选择画质</div>
+                    <div class="format-options" id="formatOptions"></div>
+                </div>
+
+                <!-- 下载按钮 -->
+                <button class="download-btn" id="videoDownloadBtn" disabled>
+                    ⬇️ 下载视频
+                </button>
+
+                <!-- 进度条 -->
+                <div class="progress-container" id="videoProgressContainer" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="videoProgressFill"></div>
+                    </div>
+                    <div class="progress-text" id="videoProgressText">正在解析...</div>
+                </div>
+
+                <!-- 历史记录 -->
+                <div class="history-section">
+                    <div class="history-title">📜 最近下载</div>
+                    <ul class="history-list" id="downloadHistory"></ul>
+                </div>
+
                 <div class="shortcut-hint">
-                    快捷键: <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 生成像素画
+                    快捷键: <kbd>Enter</kbd> 解析链接 | <kbd>Ctrl</kbd>+<kbd>S</kbd> 下载
                 </div>
             </div>
         </section>
@@ -297,6 +286,5 @@
 
     <script src="app.js"></script>
     <script src="app2.js"></script>
-    <script src="app3.js"></script>
 </body>
 </html>
