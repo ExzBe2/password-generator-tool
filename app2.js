@@ -56,7 +56,12 @@ const DocConverter = {
                 });
                 
                 // 显示当前模式面板
-                const panelId = `${this.mode.replace(/-/g, '')}Panel`;
+                const panelIds = {
+                    'pdf-to-word': 'pdfToWordPanel',
+                    'word-to-pdf': 'wordToPdfPanel',
+                    'image-to-word': 'imageToWordPanel'
+                };
+                const panelId = panelIds[this.mode];
                 const panel = document.getElementById(panelId);
                 if (panel) panel.classList.add('active');
                 
