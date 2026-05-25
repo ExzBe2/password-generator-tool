@@ -277,15 +277,17 @@
                     <ul class="history-list" id="downloadHistory"></ul>
                 </div>
 
-                <div class="video-shortcut-hint">
-                    <div class="video-shortcut-item">
-                        <span class="shortcut-label">解析链接</span>
-                        <kbd>Enter</kbd>
-                    </div>
-                    <div class="video-shortcut-item">
-                        <span class="shortcut-label">下载视频</span>
-                        <kbd>Ctrl</kbd>+<kbd>S</kbd>
-                    </div>
+                <div class="action-buttons">
+                    <button class="action-btn" id="parseBtn">
+                        <span class="action-icon">🔍</span>
+                        <span class="action-text">解析链接</span>
+                        <span class="action-shortcut">Enter</span>
+                    </button>
+                    <button class="action-btn" id="quickDownloadBtn" disabled>
+                        <span class="action-icon">⬇️</span>
+                        <span class="action-text">下载视频</span>
+                        <span class="action-shortcut">Ctrl+S</span>
+                    </button>
                 </div>
             </div>
         </section>

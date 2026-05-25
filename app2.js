@@ -442,6 +442,8 @@ const VideoDownloader = {
             videoDuration: document.getElementById('videoDuration'),
             formatOptions: document.getElementById('formatOptions'),
             downloadBtn: document.getElementById('videoDownloadBtn'),
+            quickDownloadBtn: document.getElementById('quickDownloadBtn'),
+            parseBtn: document.getElementById('parseBtn'),
             progressContainer: document.getElementById('videoProgressContainer'),
             progressFill: document.getElementById('videoProgressFill'),
             progressText: document.getElementById('videoProgressText'),
@@ -460,8 +462,18 @@ const VideoDownloader = {
             }
         });
         
+        // 解析按钮
+        this.elements.parseBtn.addEventListener('click', () => {
+            this.parseUrl();
+        });
+        
         // 下载按钮
         this.elements.downloadBtn.addEventListener('click', () => {
+            this.downloadVideo();
+        });
+        
+        // 快速下载按钮
+        this.elements.quickDownloadBtn.addEventListener('click', () => {
             this.downloadVideo();
         });
         
@@ -597,6 +609,7 @@ const VideoDownloader = {
         
         // 启用下载按钮
         this.elements.downloadBtn.disabled = false;
+        this.elements.quickDownloadBtn.disabled = false;
     },
     
     async downloadVideo() {
